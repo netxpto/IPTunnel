@@ -1,0 +1,12 @@
+Tasks:
+	1) implementação do bloco IPTunnel
+	2) colocar o BB84 a funcionar entre duas máquinas no laboratório
+	3) interface gráfica para o BB84
+
+2019-05-10
+
+	trata-se das questões administrativas com a Sandra Corujo
+	github fazer o fork do repositório netxpto/IPTunnel
+	pensar na forma de construir o bloco ip_tunnel
+
+next meeting: 15/5 (quarta-feira), 14h
