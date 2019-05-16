@@ -28,17 +28,16 @@ public:
 private:
 
 	// # Input Parameters ########################################################
-	long int numberOfSamples{ -1 };
-	long int processedSamples{ 0 };
-	bool displayNumberOfSamples{ true};
+	long int numberOfSamples{};
+	long int processedSamples{};
+	bool displayNumberOfSamples{};
 	char ipAddress{ -1 };
 	int tcpPort{};
 	int numberOfTrials{ 5 };
 	int numberOfRepetions{ 3 };
 
 	// # State Variables #########################################################
-	bool alive{ true };
-	bool finished{ false };
+	bool blocked{ false };
 
 };
 

@@ -27,6 +27,9 @@
     <ClCompile Include="ip_tunnel_sdf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="lib\ip_tunnel_20180815.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\binary_source_20180815.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\sink_20180815.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ip_tunnel_20180815.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
