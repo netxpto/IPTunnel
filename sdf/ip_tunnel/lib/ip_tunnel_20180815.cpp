@@ -1,21 +1,5 @@
 # include "../include/ip_tunnel_20180815.h"
-//#include <unistd.h>  #include <netinet/in.h> 
-/*#include <Ws2tcpip.h>
-#include <stdlib.h>
-#include <io.h>
-#pragma comment(lib, "Ws2_32.lib")
-#include <algorithm> 
-#define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
-
-using namespace std;
-#define SO_UPDATE_CONNECT_CONTEXT   0x7010
 #pragma warning(disable:4996) 
-/*
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-*/
 #include <iostream>
 #include <string>
 #include <WS2tcpip.h>
@@ -23,85 +7,51 @@ using namespace std;
 
 SOCKET createConnection(char*);
 SOCKET createListeningSocket();
-void receiveMessage(int sockfd);
-void sendMessage(int connfd, char * format);
 
+bool server();
+bool client();
 
 bool IPTunnel::runBlock(void)
 {
-	string ipAddress = "192.168.1.8";			// IP Address of the server
-	int port = 54010;						// Listening port # on the server
 
-	// Initialize WinSock
-	WSAData data;
-	WORD ver = MAKEWORD(2, 2);
-	int wsResult = WSAStartup(ver, &data);
-	if (wsResult != 0)
-	{
-		cerr << "Can't start Winsock, Err #" << wsResult << endl;
-		return false;
+	int ready = inputSignals[0]->ready(); //int ready2 = inputTCPConnetion[0]->ready();
+
+	cout << "---------------- IP Tunnel ----------------------\n";
+	int process;
+	if (numberOfSamples >= 0) {
+		process = min((long int)ready, numberOfSamples);
+	}
+	else {
+		process = ready;
 	}
 
-	// Create socket
-	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
-	if (sock == INVALID_SOCKET)
-	{
-		cerr << "Can't create socket, Err #" << WSAGetLastError() << endl;
-		WSACleanup();
-		return false;
+	if (process == 0) {
+		alive = false;
+		return alive; //blocked = true;
 	}
-
-	// Fill in a hint structure
-	sockaddr_in hint;
-	hint.sin_family = AF_INET;
-	hint.sin_port = htons(port);
-	inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
-
-	// Connect to server
-	int connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
-	if (connResult == SOCKET_ERROR)
-	{
-		cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
-		closesocket(sock);
-		WSACleanup();
-		return false;
-	}
-
-	// Do-while loop to send and receive data
-	char buf[4096];
-	string userInput;
-
-	do
-	{
-		// Prompt the user for some text
-		cout << "> ";
-		getline(cin, userInput);
-
-		if (userInput.size() > 0)		// Make sure the user has typed in something
-		{
-			// Send the text
-			int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
-			if (sendResult != SOCKET_ERROR)
-			{
-				// Wait for response
-				ZeroMemory(buf, 4096);
-				int bytesReceived = recv(sock, buf, 4096, 0);
-				if (bytesReceived > 0)
-				{
-					// Echo response to console
-					cout << "SERVER> " << string(buf, 0, bytesReceived) << endl;
-				}
-			}
+	else {
+		outputSignals[0]->bufferPut((t_binary)ready); //process;
+		for (int i = 0; i < process; i++) {
+			inputSignals[0]->bufferGet();
+			++processedSamples;
 		}
 
-	} while (userInput.size() > 0);
+	}
 
-	// Gracefully close down everything
-	closesocket(sock);
-	WSACleanup();
+
+	if (numberOfSamples >= 0) numberOfSamples -= process;
+
+	if (displayNumberOfSamples) {
+		cout << "ip tunnel Samples to receive: " << 0 << "\n";
+		cout << "ip tunnel Samples to send: " << process << "\n";
+	}
+
+
+	return false; //~(blocked); // & entangledBlocked());
+	
 
 	/*
-	int ready = inputSignals[0]->ready(); //int ready2 = inputTCPConnetion[0]->ready();
+	
 	WSADATA wsaData;
 
 	int iResult;
@@ -279,42 +229,184 @@ bool IPTunnel::runBlock(void)
 	//close(newsockfd);
 	//close(sockfd);
 	return 0;*/
-	
+}
 
-	/*
-	cout << "---------------- IP Tunnel ----------------------\n";
-	int process;
-	if (numberOfSamples >= 0) {
-		process = min((long int)ready, numberOfSamples);
+bool server() {
+	//SERVER -------------------------------------------------------------------------
+	// Initialze winsock
+	WSADATA wsData;
+	WORD ver = MAKEWORD(2, 2);
+
+	int wsOk = WSAStartup(ver, &wsData);
+	if (wsOk != 0)
+	{
+		cerr << "Can't Initialize winsock! Quitting" << endl;
+		return false;
 	}
-	else {
-		process = ready;
+
+	// Create a socket
+	SOCKET listening = socket(AF_INET, SOCK_STREAM, 0);
+	if (listening == INVALID_SOCKET)
+	{
+		cerr << "Can't create a socket! Quitting" << endl;
+		return false;
 	}
-	 
-	if (process == 0) {
-		alive = false;
-		return alive; //blocked = true;
+
+	// Bind the ip address and port to a socket
+	sockaddr_in hint;
+	hint.sin_family = AF_INET;
+	hint.sin_port = htons(54000);
+	hint.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");//INADDR_ANY; // Could also use inet_pton .... 
+
+
+	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {
+		printf("\n ERROR on binding");
+		//exit(1);
 	}
-	else {
-		outputSignals[0]->bufferPut((t_binary)ready); //process;
-		for (int i = 0; i < process; i++) {
-			inputSignals[0]->bufferGet();
-			++processedSamples;
+	// Tell Winsock the socket is for listening 
+
+
+	if (listen(listening, SOMAXCONN) == -1) {
+		printf("\n ERROR on binding");
+		//exit(1);
+	}
+	// Wait for a connection
+	sockaddr_in client;
+	int clientSize = sizeof(client);
+
+	SOCKET clientSocket = accept(listening, (sockaddr*)&client, &clientSize);
+
+	char host[NI_MAXHOST];		// Client's remote name
+	char service[NI_MAXSERV];	// Service (i.e. port) the client is connect on
+
+	ZeroMemory(host, NI_MAXHOST); // same as memset(host, 0, NI_MAXHOST);
+	ZeroMemory(service, NI_MAXSERV);
+
+	if (getnameinfo((sockaddr*)&client, sizeof(client), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
+	{
+		cout << host << " connected on port " << service << endl;
+	}
+	else
+	{
+		inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
+		cout << host << " connected on port " <<
+			ntohs(client.sin_port) << endl;
+	}
+
+	// Close listening socket
+	closesocket(listening);
+
+	// While loop: accept and echo message back to client
+	char buf[4096];
+
+	while (true)
+	{
+		ZeroMemory(buf, 4096);
+
+		// Wait for client to send data
+		int bytesReceived = recv(clientSocket, buf, 4096, 0);
+		if (bytesReceived == SOCKET_ERROR)
+		{
+			cerr << "Error in recv(). Quitting" << WSAGetLastError() << endl;
+			break;
 		}
-		
+
+		if (bytesReceived == 0)
+		{
+			cout << "Client disconnected " << endl;
+			break;
+		}
+
+		cout << string(buf, 0, bytesReceived) << endl;
+
+		// Echo message back to client
+		send(clientSocket, buf, bytesReceived + 1, 0);
+
 	}
-	
 
-	if (numberOfSamples >= 0) numberOfSamples -= process;
+	// Close the socket
+	closesocket(clientSocket);
 
-	if (displayNumberOfSamples) {
-		cout << "ip tunnel Samples to receive: " << 0 << "\n";
-		cout << "ip tunnel Samples to send: " << process << "\n";
+	// Cleanup winsock
+	WSACleanup();
+
+	system("pause");
+	//SERVER -------------------------------------------------------------------------
+}
+
+bool client() {
+	//CLIENTE -------------------------------------------------------------------------
+	string ipAddress = "127.0.0.1";			// IP Address of the server
+	int port = 54000;						// Listening port # on the server
+
+	// Initialize WinSock
+	WSAData data;
+	WORD ver = MAKEWORD(2, 2);
+	int wsResult = WSAStartup(ver, &data);
+	if (wsResult != 0)
+	{
+		cerr << "Can't start Winsock, Err #" << wsResult << endl;
+		return false;
 	}
-	*/
 
-	return false; //~(blocked); // & entangledBlocked());
+	// Create socket
+	SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+	if (sock == INVALID_SOCKET)
+	{
+		cerr << "Can't create socket, Err #" << WSAGetLastError() << endl;
+		WSACleanup();
+		return false;
+	}
 
+	// Fill in a hint structure
+	sockaddr_in hint;
+	hint.sin_family = AF_INET;
+	hint.sin_port = htons(port);
+	inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
+
+	// Connect to server
+	int connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
+	if (connResult == SOCKET_ERROR)
+	{
+		cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
+		closesocket(sock);
+		WSACleanup();
+		return false;
+	}
+
+	// Do-while loop to send and receive data
+	char buf[4096];
+	string userInput;
+
+	do
+	{
+		// Prompt the user for some text
+		cout << "> ";
+		getline(cin, userInput);
+
+		if (userInput.size() > 0)		// Make sure the user has typed in something
+		{
+			// Send the text
+			int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
+			if (sendResult != SOCKET_ERROR)
+			{
+				// Wait for response
+				ZeroMemory(buf, 4096);
+				int bytesReceived = recv(sock, buf, 4096, 0);
+				if (bytesReceived > 0)
+				{
+					// Echo response to console
+					cout << "SERVER> " << string(buf, 0, bytesReceived) << endl;
+				}
+			}
+		}
+
+	} while (userInput.size() > 0);
+
+	// Gracefully close down everything
+	closesocket(sock);
+	WSACleanup();
+	//CLIENTE ---------------------------------------------------------------
 }
 
 SOCKET createConnection(char *ipaddr)
