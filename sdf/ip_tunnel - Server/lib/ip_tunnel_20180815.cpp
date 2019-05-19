@@ -14,8 +14,6 @@ bool client();
 bool IPTunnel::runBlock(void)
 {
 	int ready;
-
-	
 	if (inputSignals.empty()) {
 		if (!server()) {
 			printf("Error opening server\n");
@@ -24,16 +22,15 @@ bool IPTunnel::runBlock(void)
 	}
 	else {
 		ready = inputSignals[0]->ready(); //int ready2 = inputTCPConnetion[0]->ready();
-		/*if (!client()) {
+		if (!client()) {
 			printf("Error opening client\n");
 			exit(1);
-		}*/
+		}
 	}
 	cout << "---------------- IP Tunnel ----------------------\n";
 
 	printf("%d\n",ready);
 	printf("%d\n", numberOfSamples);
-	printf("%d\n", inputSignals[0]);
 	int process;
 	if (numberOfSamples >= 0) {
 		process = min((long int)ready, numberOfSamples);
@@ -103,7 +100,7 @@ bool server() {
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(54000);
-	hint.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");//INADDR_ANY; // Could also use inet_pton .... 
+	hint.sin_addr.S_un.S_addr = inet_addr("192.168.1.8");//INADDR_ANY; // Could also use inet_pton .... 
 
 
 	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {
