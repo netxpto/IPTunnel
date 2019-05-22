@@ -1,15 +1,15 @@
-# ifndef IP_TUNNEL_H_
-# define IP_TUNNEL_H_
+# ifndef SINK_H_
+# define SINK_H_
 
 # include "../include/netxpto_20180815.h"
 
-class IPTunnel : public Block {
+class Sink : public Block {
 
 public:
 
 	// ##########################################################################
 
-	IPTunnel(initializer_list<Signal*> InputSig, initializer_list<Signal*> OutputSig) : Block(InputSig, OutputSig) {};
+	Sink(initializer_list<Signal*> InputSig, initializer_list<Signal*> OutputSig) : Block(InputSig, OutputSig) {};
 	bool runBlock(void);
 
 	// ##########################################################################
@@ -28,18 +28,12 @@ public:
 private:
 
 	// # Input Parameters ########################################################
+
 	long int numberOfSamples{ -1 };
 	long int processedSamples{ 0 };
-	bool displayNumberOfSamples{ true};
-	char ipAddress{ -1 };
-	int tcpPort{ 54000 };
-	int numberOfTrials{ 5 };
-	int numberOfRepetions{ 3 };
+	bool displayNumberOfSamples{ true };
 
-	// # State Variables #########################################################
-	bool alive{ true };
-	bool finished{ false };
-
+	// ###########################################################################
 };
 
 #endif
