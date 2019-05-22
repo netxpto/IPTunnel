@@ -29,7 +29,8 @@ bool IPTunnel::runBlock(void)
 	}
 	cout << "---------------- IP Tunnel ----------------------\n";
 
-	printf("%d\n",ready);
+	//printf("%d\n",ready);
+	printf("%d\n", inputSignals[0]);
 	printf("%d\n", numberOfSamples);
 	int process;
 	if (numberOfSamples >= 0) {
@@ -60,7 +61,7 @@ bool IPTunnel::runBlock(void)
 		cout << "ip tunnel Samples to send: " << process << "\n";
 	}
 
-	
+	//printf("%d\n", inputSignals[0]);
 	if (ready == 0) {
 		alive = false;
 		//update alive in the other block
@@ -100,7 +101,7 @@ bool server() {
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(54000);
-	hint.sin_addr.S_un.S_addr = inet_addr("192.168.1.8");//INADDR_ANY; // Could also use inet_pton .... 
+	hint.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");//INADDR_ANY; // Could also use inet_pton .... 
 
 
 	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {

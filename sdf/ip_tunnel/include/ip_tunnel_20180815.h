@@ -32,7 +32,7 @@ private:
 	long int processedSamples{ 0 };
 	bool displayNumberOfSamples{ true};
 	char ipAddress{ -1 };
-	int tcpPort{};
+	int tcpPort{ 54000 };
 	int numberOfTrials{ 5 };
 	int numberOfRepetions{ 3 };
 

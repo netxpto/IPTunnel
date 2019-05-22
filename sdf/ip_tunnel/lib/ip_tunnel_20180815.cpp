@@ -1,15 +1,14 @@
 # include "../include/ip_tunnel_20180815.h"
+
 #pragma warning(disable:4996) 
-#include <iostream>
 #include <string>
 #include <WS2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+#include <string> 
 
-SOCKET createConnection(char*);
-SOCKET createListeningSocket();
-
-bool server();
+bool server(Signal*);
 bool client();
+
 
 bool IPTunnel::runBlock(void)
 {
@@ -17,23 +16,33 @@ bool IPTunnel::runBlock(void)
 
 	
 	if (inputSignals.empty()) {
-		if (!server()) {
+		if (!server(inputSignals[0])) {
 			printf("Error opening server\n");
 			exit(1);
 		}
 	}
 	else {
 		ready = inputSignals[0]->ready(); //int ready2 = inputTCPConnetion[0]->ready();
-		/*if (!client()) {
+
+		if (!client()) {
 			printf("Error opening client\n");
 			exit(1);
-		}*/
+		}
 	}
-	cout << "---------------- IP Tunnel ----------------------\n";
 
+	
+	//std::cout << std::bitset<64>(ready);
+	
+	//ready = ready << 2;
+	
+	//int temp = ready;
+
+	cout << "---------------- IP Tunnel ----------------------\n";
+	cout << "---------------- IP Tunnel ----------------------\n";
 	printf("%d\n",ready);
 	printf("%d\n", numberOfSamples);
 	printf("%d\n", inputSignals[0]);
+	auto temp = inputSignals[0];
 	int process;
 	if (numberOfSamples >= 0) {
 		process = min((long int)ready, numberOfSamples);
@@ -41,10 +50,10 @@ bool IPTunnel::runBlock(void)
 	else {
 		process = ready;
 	}
-
+	printf("process:%d\n", process);
 	if (process == 0) {
 		alive = false;
-		return alive; //blocked = true;
+		//return alive; //blocked = true;
 	}
 	else {
 		outputSignals[0]->bufferPut((t_binary)ready); //process;
@@ -54,7 +63,7 @@ bool IPTunnel::runBlock(void)
 		}
 
 	}
-
+	printf("process:%d\n", process);
 
 	if (numberOfSamples >= 0) numberOfSamples -= process;
 
@@ -62,9 +71,9 @@ bool IPTunnel::runBlock(void)
 		cout << "ip tunnel Samples to receive: " << 0 << "\n";
 		cout << "ip tunnel Samples to send: " << process << "\n";
 	}
-
+	printf("%d\n", inputSignals[0]);
 	
-	if (ready == 0) {
+	if (process == 0) {
 		alive = false;
 		//update alive in the other block
 
@@ -78,7 +87,7 @@ bool IPTunnel::runBlock(void)
 	
 }
 
-bool server() {
+bool server(Signal* inputSignal) {
 	//SERVER -------------------------------------------------------------------------
 	// Initialze winsock
 	WSADATA wsData;
@@ -150,6 +159,9 @@ bool server() {
 	{
 		ZeroMemory(buf, 4096);
 
+
+		int sen = send(clientSocket, (char*)&inputSignal, sizeof(inputSignal), 0);
+
 		// Wait for client to send data
 		int bytesReceived = recv(clientSocket, buf, 4096, 0);
 		if (bytesReceived == SOCKET_ERROR)
@@ -212,13 +224,18 @@ bool client() {
 	inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
 
 	// Connect to server
-	int connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
-	if (connResult == SOCKET_ERROR)
-	{
-		cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
-		closesocket(sock);
-		WSACleanup();
-		return false;
+	int connResult = -2;
+	while (connResult != 0 ) {
+		connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
+		printf("%d\n", connResult);
+		if (connResult == SOCKET_ERROR)
+		{
+			cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
+			//closesocket(sock);
+			//WSACleanup();
+			//return false;
+		}
+		Sleep(3000);
 	}
 
 	// Do-while loop to send and receive data
@@ -245,6 +262,9 @@ bool client() {
 					// Echo response to console
 					cout << "SERVER> " << string(buf, 0, bytesReceived) << endl;
 				}
+			}
+			else {
+				cerr << "Got no reply, Err #" << WSAGetLastError() << endl;
 			}
 		}
 
