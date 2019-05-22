@@ -9,6 +9,11 @@
 bool server(Signal*);
 bool client();
 
+void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
+{
+
+}
+
 
 bool IPTunnel::runBlock(void)
 {

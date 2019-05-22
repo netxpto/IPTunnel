@@ -33,7 +33,7 @@ int main() {
 	BinarySource_.setBitPeriod(1e-6);
 	BinarySource_.setNumberOfBits(numberOfBits);
 	
-	IPTunnel ip_tunnel{ {&BinarySourceOut_1},{&IPTunnelSourceOut_3} };
+	IPTunnel IpTunnel_{ {&BinarySourceOut_1},{&IPTunnelSourceOut_3} };
 	
 	Sink Sink_0{ {&IPTunnelSourceOut_3},{} };
 
@@ -48,7 +48,7 @@ int main() {
 	System MainSystem{ 
 		{ 
 			&BinarySource_,
-			&ip_tunnel,
+			&IpTunnel_,
 			&Sink_1,
 			&Sink_2
 
