@@ -1,19 +1,15 @@
-# include "../include/ip_tunnel_20180815.h"
-#pragma warning(disable:4996) 
-#include <iostream>
+# include "../../ip_tunnel/include/ip_tunnel_20180815.h"
+
+#pragma warning(disable:4996) //inet_addr()
 #include <string>
 #include <WS2tcpip.h>
 #pragma comment(lib, "ws2_32.lib")
+#include <string> 
 
-SOCKET createConnection(char*);
-SOCKET createListeningSocket();
+SOCKET clientSocket;
 
-bool server();
-bool client();
-
-bool IPTunnel::runBlock(void)
+void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
 {
-	int ready;
 	if (inputSignals.empty()) {
 		if (!server()) {
 			printf("Error opening server\n");
@@ -21,17 +17,151 @@ bool IPTunnel::runBlock(void)
 		}
 	}
 	else {
-		ready = inputSignals[0]->ready(); //int ready2 = inputTCPConnetion[0]->ready();
+
 		if (!client()) {
 			printf("Error opening client\n");
 			exit(1);
 		}
 	}
-	cout << "---------------- IP Tunnel ----------------------\n";
+}
 
+
+bool IPTunnel::runBlock(void)
+{
+	int ready = 0;
+
+	
+	//client ------------> server
+
+	//no inicio do run deve atualizar as variavies ready e space (ipTunnelSpace()) process = min(ready, space)
+	if (inputSignals.empty()) { //server
+		
+		long space = outputSignals[0]->space();
+		for (auto k : outputSignals) {
+			long int aux = k->space();
+			space = min(space, aux);
+		}
+		printf("space:%d\n", space);
+		int data = space;
+		printf("data:%d\n", data);
+		printf("sending space to client\n");
+		char* tosend = (char*)&data;
+		int remaining = sizeof(data);
+		int result = 0;
+		int sent = 0;
+		while (remaining > 0) {
+			printf("clientSocket:%d\n", clientSocket);
+			result = send(clientSocket, tosend + sent, remaining, 0);
+			if (result > 0) {
+				remaining -= result;
+				sent += remaining;
+			}
+			else if (result < 0) {
+				printf("ERROR!\n");
+				// probably a good idea to close socket
+				break;
+			}
+			printf("Remaining to send:%d\n", remaining);
+		}
+		printf("Sent space!!!\n");
+
+
+		printf("waiting to receive the signal...\n");
+		//----------------------------------------RECEIVING THE SIGNAL----------------------------------------
+		
+
+		int process = ipTunnelRecvInt();
+		int type = ipTunnelRecvInt();
+
+		t_binary valueBinary;
+		t_real valueReal;
+		t_complex valueComplex;
+		t_complex_xy valueComplexXy;
+		t_photon_mp_xy valueComplexMp;
+
+		//t_binary value;
+		char* recv_buffer = 0;
+		
+		switch (type) {
+			case 1: //signal_value_type::t_binary:
+				printf("binary");
+				recv_buffer = (char*)&valueBinary;
+				remaining = sizeof(t_binary);
+				break;
+			case 2: //signal_value_type::t_real: 
+				printf("t_real");
+				recv_buffer = (char*)&valueReal;
+				remaining = sizeof(t_real);
+				break;
+			case 3: //signal_value_type::t_complex: 
+				printf("t_complex");
+				recv_buffer = (char*)&valueComplex;
+				remaining = sizeof(t_complex);
+				break;
+			case 4: //signal_value_type::t_complex_xy: 
+				printf("t_complex_xy");
+				recv_buffer = (char*)&valueComplexXy;
+				remaining = sizeof(t_complex_xy);
+				break;
+
+			case 5: //signal_value_type::t_photon_mp_xy:
+				printf("t_photon_mp_xy");
+				recv_buffer = (char*)&valueComplexMp;
+				remaining = sizeof(t_photon_mp_xy);
+				break;
+		}
+		
+
+		
+		
+		for (int k = 0; k < process; k++) {
+			int received = 0;
+			result = 0;
+			while (remaining > 0) {
+				result = recv(clientSocket, recv_buffer + received, remaining, 0);
+				if (result > 0) {
+					remaining -= result;
+					received += result;
+				}
+				else if (result == 0) {
+					printf("Remote side closed his end of the connection before all data was received\n");
+					// probably a good idea to close socket
+					break;
+				}
+				else if (result < 0) {
+					printf("ERROR!\n");
+					// probably a good idea to close socket
+					break;
+				}
+			}
+			//outputSignals[0]->bufferPut(value);
+			printf("%d Signal Received!!!\n",k+1);
+		}
+
+		while (true) { Sleep(1000); }
+	}
+	else { //client
+		ready = inputSignals[0]->ready();
+
+	}
+	
+
+
+	
+
+	
+	//std::cout << std::bitset<64>(ready);
+	
+	//ready = ready << 2;
+	
+	//int temp = ready;
+
+	cout << "---------------- IP Tunnel ----------------------\n";
+	cout << "---------------- IP Tunnel ----------------------\n";
 	//printf("%d\n",ready);
-	printf("%d\n", inputSignals[0]);
-	printf("%d\n", numberOfSamples);
+	//printf("%d\n", numberOfSamples);
+	//printf("%d\n", inputSignals[0]);
+	//auto temp = inputSignals[0];
 	int process;
 	if (numberOfSamples >= 0) {
 		process = min((long int)ready, numberOfSamples);
@@ -39,10 +169,10 @@ bool IPTunnel::runBlock(void)
 	else {
 		process = ready;
 	}
-
+	printf("process:%d\n", process);
 	if (process == 0) {
-		alive = false;
-		return alive; //blocked = true;
+		//alive = false;
+		//return alive; //blocked = true;
 	}
 	else {
 		outputSignals[0]->bufferPut((t_binary)ready); //process;
@@ -52,7 +182,7 @@ bool IPTunnel::runBlock(void)
 		}
 
 	}
-
+	printf("process:%d\n", process);
 
 	if (numberOfSamples >= 0) numberOfSamples -= process;
 
@@ -60,10 +190,10 @@ bool IPTunnel::runBlock(void)
 		cout << "ip tunnel Samples to receive: " << 0 << "\n";
 		cout << "ip tunnel Samples to send: " << process << "\n";
 	}
-
 	//printf("%d\n", inputSignals[0]);
-	if (ready == 0) {
-		alive = false;
+	
+	if (process == 0) {
+		//alive = false;
 		//update alive in the other block
 
 	}
@@ -72,11 +202,61 @@ bool IPTunnel::runBlock(void)
 	}
 
 
-	return false; //~(blocked); // & entangledBlocked());
+	return true; //~(blocked); // & entangledBlocked());
 	
 }
 
-bool server() {
+void IPTunnel::ipTunnelSendInt(int space) {
+	int data = space;
+	char* tosend = (char*)&data;
+	int remaining = sizeof(data);
+	int result = 0;
+	int sent = 0;
+	while (remaining > 0) {
+		result = send(clientSocket, tosend + sent, remaining, 0);
+		if (result > 0) {
+			remaining -= result;
+			sent += remaining;
+		}
+		else if (result < 0) {
+			printf("ERROR!\n");
+			// probably a good idea to close socket
+			break;
+		}
+	}
+}
+
+int IPTunnel::ipTunnelRecvInt() {
+	int value = 0;
+	char* recv_buffer = (char*)&value;
+	int remaining = sizeof(int);
+	int received = 0;
+	int result = 0;
+	while (remaining > 0) {
+		result = recv(clientSocket, recv_buffer + received, remaining, 0);
+		if (result > 0) {
+			remaining -= result;
+			received += result;
+		}
+		else if (result == 0) {
+			printf("Remote side closed his end of the connection before all data was received\n");
+			// probably a good idea to close socket
+			break;
+		}
+		else if (result < 0) {
+			printf("ERROR!\n");
+			// probably a good idea to close socket
+			break;
+		}
+	}
+	return value;
+}
+/*
+void ipTunnelSpace() {
+
+}*/
+
+bool IPTunnel::server() {
 	//SERVER -------------------------------------------------------------------------
 	// Initialze winsock
 	WSADATA wsData;
@@ -119,7 +299,7 @@ bool server() {
 	sockaddr_in client;
 	int clientSize = sizeof(client);
 
-	SOCKET clientSocket = accept(listening, (sockaddr*)&client, &clientSize);
+	clientSocket = accept(listening, (sockaddr*)&client, &clientSize);
 
 	char host[NI_MAXHOST];		// Client's remote name
 	char service[NI_MAXSERV];	// Service (i.e. port) the client is connect on
@@ -139,14 +319,18 @@ bool server() {
 	}
 
 	// Close listening socket
-	closesocket(listening);
+	//closesocket(listening);
 
+	/*
 	// While loop: accept and echo message back to client
 	char buf[4096];
 
 	while (true)
 	{
 		ZeroMemory(buf, 4096);
+
+
+		int sen = send(clientSocket, (char*)&inputSignal, sizeof(inputSignal), 0);
 
 		// Wait for client to send data
 		int bytesReceived = recv(clientSocket, buf, 4096, 0);
@@ -175,11 +359,11 @@ bool server() {
 	// Cleanup winsock
 	WSACleanup();
 
-	system("pause");
+	system("pause");*/
 	//SERVER -------------------------------------------------------------------------
 }
 
-bool client() {
+bool IPTunnel::client() {
 	//CLIENTE -------------------------------------------------------------------------
 	string ipAddress = "127.0.0.1";			// IP Address of the server
 	int port = 54000;						// Listening port # on the server
@@ -210,15 +394,20 @@ bool client() {
 	inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
 
 	// Connect to server
-	int connResult = connect(sock, (sockaddr*)&hint, sizeof(hint));
-	if (connResult == SOCKET_ERROR)
-	{
-		cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
-		closesocket(sock);
-		WSACleanup();
-		return false;
+	while (clientSocket != 0 ) {
+		clientSocket = connect(sock, (sockaddr*)&hint, sizeof(hint));
+		printf("%d\n", clientSocket);
+		if (clientSocket == SOCKET_ERROR)
+		{
+			cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
+			//closesocket(sock);
+			//WSACleanup();
+			//return false;
+		}
+		Sleep(3000);
 	}
 
+	/*
 	// Do-while loop to send and receive data
 	char buf[4096];
 	string userInput;
@@ -244,14 +433,15 @@ bool client() {
 					cout << "SERVER> " << string(buf, 0, bytesReceived) << endl;
 				}
 			}
+			else {
+				cerr << "Got no reply, Err #" << WSAGetLastError() << endl;
+			}
 		}
 
 	} while (userInput.size() > 0);
 
 	// Gracefully close down everything
 	closesocket(sock);
-	WSACleanup();
+	WSACleanup();*/
 	//CLIENTE ---------------------------------------------------------------
 }
-
-

@@ -10,6 +10,7 @@ public:
 	// ##########################################################################
 
 	IPTunnel(initializer_list<Signal*> InputSig, initializer_list<Signal*> OutputSig) : Block(InputSig, OutputSig) {};
+	void initialize(void);
 	bool runBlock(void);
 
 	// ##########################################################################

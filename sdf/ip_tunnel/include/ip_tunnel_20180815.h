@@ -14,6 +14,12 @@ public:
 	void initialize(void);
 	bool runBlock(void);
 
+	void ipTunnelSendInt(int space);
+	int ipTunnelRecvInt();
+
+	template <class T>
+	int ipTunnelPut(T object);
+
 	// ##########################################################################
 
 	void setNumberOfSamples(long int nOfSamples) { numberOfSamples = nOfSamples; };
@@ -25,6 +31,9 @@ public:
 	void setDisplayNumberOfSamples(bool opt) { displayNumberOfSamples = opt; };
 	bool getDisplayNumberOfSamples() const { return displayNumberOfSamples; };
 
+	bool server();
+	bool client();
+
 	// ###########################################################################
 	
 private:
@@ -33,7 +42,7 @@ private:
 	long int numberOfSamples{ -1 };
 	long int processedSamples{ 0 };
 	bool displayNumberOfSamples{ true};
-	char ipAddress{ -1 };
+	string ipAddressServer{ "127.0.0.1" };
 	int tcpPort{ 54000 };
 	int numberOfTrials{ 5 };
 	int numberOfRepetions{ 3 };
