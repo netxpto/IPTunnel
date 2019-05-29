@@ -42,6 +42,7 @@ private:
 	long int numberOfSamples{ -1 };
 	long int processedSamples{ 0 };
 	bool displayNumberOfSamples{ true};
+	//const char* ipAddressServer{ "127.0.0.1" };
 	string ipAddressServer{ "127.0.0.1" };
 	int tcpPort{ 54000 };
 	int numberOfTrials{ 5 };

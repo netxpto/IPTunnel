@@ -1,4 +1,4 @@
-# include "../include/ip_tunnel_20180815.h" 
+# include "../../ip_tunnel/include/ip_tunnel_20180815.h" 
 
 
 #pragma warning(disable:4996) //inet_addr()
@@ -11,13 +11,14 @@ SOCKET clientSocket;
 void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
 {
 	if (inputSignals.empty()) {
+		printf("server");
 		if (!server()) {
 			printf("Error opening server\n");
 			exit(1);
 		}
 	}
 	else {
-
+		printf("cliente");
 		if (!client()) {
 			printf("Error opening client\n");
 			exit(1);
@@ -41,12 +42,105 @@ bool IPTunnel::runBlock(void)
 			long int aux = k->space();
 			space = min(space, aux);
 		}
+		printf("space:%d\n", space);
+		int data = space;
+		printf("data:%d\n", data);
 		printf("sending space to client\n");
-		ipTunnelSendInt(space);
+		char* tosend = (char*)&data;
+		int remaining = sizeof(data);
+		int result = 0;
+		int sent = 0;
+		while (remaining > 0) {
+			printf("clientSocket:%d\n", clientSocket);
+			result = send(clientSocket, tosend + sent, remaining, 0);
+			if (result > 0) {
+				remaining -= result;
+				sent += remaining;
+			}
+			else if (result < 0) {
+				printf("ERROR!\n");
+				// probably a good idea to close socket
+				break;
+			}
+			printf("Remaining to send:%d\n", remaining);
+		}
+		printf("Sent space!!!\n");
+
 
 		printf("waiting to receive the signal...\n");
+		//----------------------------------------RECEIVING THE SIGNAL----------------------------------------
 
-		printf("Signal Received!!!\n");
+
+		int process = ipTunnelRecvInt();
+		int type = ipTunnelRecvInt();
+
+		t_binary valueBinary;
+		t_real valueReal;
+		t_complex valueComplex;
+		t_complex_xy valueComplexXy;
+		t_photon_mp_xy valueComplexMp;
+
+		//t_binary value;
+		char* recv_buffer = 0;
+
+
+		switch (type) {
+		case 1: //signal_value_type::t_binary:
+			printf("binary");
+			recv_buffer = (char*)&valueBinary;
+			remaining = sizeof(t_binary);
+			break;
+		case 2: //signal_value_type::t_real: 
+			printf("t_real");
+			recv_buffer = (char*)&valueReal;
+			remaining = sizeof(t_real);
+			break;
+		case 3: //signal_value_type::t_complex: 
+			printf("t_complex");
+			recv_buffer = (char*)&valueComplex;
+			remaining = sizeof(t_complex);
+			break;
+		case 4: //signal_value_type::t_complex_xy: 
+			printf("t_complex_xy");
+			recv_buffer = (char*)&valueComplexXy;
+			remaining = sizeof(t_complex_xy);
+			break;
+
+		case 5: //signal_value_type::t_photon_mp_xy:
+			printf("t_photon_mp_xy");
+			recv_buffer = (char*)&valueComplexMp;
+			remaining = sizeof(t_photon_mp_xy);
+			break;
+		}
+
+
+
+
+		for (int k = 0; k < process; k++) {
+			int received = 0;
+			result = 0;
+			while (remaining > 0) {
+				result = recv(clientSocket, recv_buffer + received, remaining, 0);
+				if (result > 0) {
+					remaining -= result;
+					received += result;
+				}
+				else if (result == 0) {
+					printf("Remote side closed his end of the connection before all data was received\n");
+					// probably a good idea to close socket
+					break;
+				}
+				else if (result < 0) {
+					printf("ERROR!\n");
+					// probably a good idea to close socket
+					break;
+				}
+			}
+			//outputSignals[0]->bufferPut(value);
+			printf("%d Signal Received!!!\n", k + 1);
+		}
+
+		while (true) { Sleep(1000); }
 
 	}
 	else { //client
@@ -272,8 +366,8 @@ bool IPTunnel::server() {
 	// Bind the ip address and port to a socket
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
-	hint.sin_port = htons(tcpPort);
-	hint.sin_addr.S_un.S_addr = INADDR_ANY; // inet_addr("127.0.0.1");//Could also use inet_pton .... 
+	hint.sin_port = ntohs(tcpPort);
+	hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str()); // inet_addr("127.0.0.1");//Could also use inet_pton .... 
 
 
 	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {
@@ -357,8 +451,6 @@ bool IPTunnel::server() {
 
 bool IPTunnel::client() {
 	//CLIENTE -------------------------------------------------------------------------
-	//string ipAddress = "127.0.0.1";			// IP Address of the server
-	int port = tcpPort;						// Listening port # on the server
 
 	// Initialize WinSock
 	WSAData data;
@@ -382,8 +474,8 @@ bool IPTunnel::client() {
 	// Fill in a hint structure
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
-	hint.sin_port = htons(port);
-	inet_pton(AF_INET, ipAddress.c_str(), &hint.sin_addr);
+	hint.sin_port = htons(tcpPort);
+	inet_pton(AF_INET, ipAddressServer.c_str(), &hint.sin_addr);
 
 	// Connect to server
 	int connResult = -2;
