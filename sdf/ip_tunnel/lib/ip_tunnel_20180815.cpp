@@ -1,10 +1,9 @@
 # include "../../ip_tunnel/include/ip_tunnel_20180815.h" 
 
+#pragma warning(disable:4996) //inet_addr() is deprecated, only way to use it
+#include <WS2tcpip.h> //official windows header with some functions neededd, 
+#pragma comment(lib, "ws2_32.lib") //link the winsock library file, can also link Settings->linker->Additional dependency
 
-#pragma warning(disable:4996) //inet_addr()
-#include <WS2tcpip.h>
-#pragma comment(lib, "ws2_32.lib")
-#include <string> 
 
 SOCKET clientSocket;
 
@@ -43,27 +42,10 @@ bool IPTunnel::runBlock(void)
 			space = min(space, aux);
 		}
 		printf("space:%d\n", space);
-		int data = space;
-		printf("data:%d\n", data);
 		printf("sending space to client\n");
-		char* tosend = (char*)&data;
-		int remaining = sizeof(data);
-		int result = 0;
-		int sent = 0;
-		while (remaining > 0) {
-			printf("clientSocket:%d\n", clientSocket);
-			result = send(clientSocket, tosend + sent, remaining, 0);
-			if (result > 0) {
-				remaining -= result;
-				sent += remaining;
-			}
-			else if (result < 0) {
-				printf("ERROR!\n");
-				// probably a good idea to close socket
-				break;
-			}
-			printf("Remaining to send:%d\n", remaining);
-		}
+
+		ipTunnelSendInt(space);
+
 		printf("Sent space!!!\n");
 
 
@@ -80,43 +62,41 @@ bool IPTunnel::runBlock(void)
 		t_complex_xy valueComplexXy;
 		t_photon_mp_xy valueComplexMp;
 
-		//t_binary value;
+
+		int result = 0;
+		int remaining;
 		char* recv_buffer = 0;
 
-
-		switch (type) {
-		case 1: //signal_value_type::t_binary:
-			printf("binary");
-			recv_buffer = (char*)&valueBinary;
-			remaining = sizeof(t_binary);
-			break;
-		case 2: //signal_value_type::t_real: 
-			printf("t_real");
-			recv_buffer = (char*)&valueReal;
-			remaining = sizeof(t_real);
-			break;
-		case 3: //signal_value_type::t_complex: 
-			printf("t_complex");
-			recv_buffer = (char*)&valueComplex;
-			remaining = sizeof(t_complex);
-			break;
-		case 4: //signal_value_type::t_complex_xy: 
-			printf("t_complex_xy");
-			recv_buffer = (char*)&valueComplexXy;
-			remaining = sizeof(t_complex_xy);
-			break;
-
-		case 5: //signal_value_type::t_photon_mp_xy:
-			printf("t_photon_mp_xy");
-			recv_buffer = (char*)&valueComplexMp;
-			remaining = sizeof(t_photon_mp_xy);
-			break;
-		}
-
-
-
-
 		for (int k = 0; k < process; k++) {
+			switch (type) {
+				case 1: //signal_value_type::t_binary:
+					printf("binary");
+					recv_buffer = (char*)&valueBinary;
+					remaining = sizeof(t_binary);
+					break;
+				case 2: //signal_value_type::t_real: 
+					printf("t_real");
+					recv_buffer = (char*)&valueReal;
+					remaining = sizeof(t_real);
+					break;
+				case 3: //signal_value_type::t_complex: 
+					printf("t_complex");
+					recv_buffer = (char*)&valueComplex;
+					remaining = sizeof(t_complex);
+					break;
+				case 4: //signal_value_type::t_complex_xy: 
+					printf("t_complex_xy");
+					recv_buffer = (char*)&valueComplexXy;
+					remaining = sizeof(t_complex_xy);
+					break;
+
+				case 5: //signal_value_type::t_photon_mp_xy:
+					printf("t_photon_mp_xy");
+					recv_buffer = (char*)&valueComplexMp;
+					remaining = sizeof(t_photon_mp_xy);
+					break;
+			}
+
 			int received = 0;
 			result = 0;
 			while (remaining > 0) {
@@ -136,8 +116,26 @@ bool IPTunnel::runBlock(void)
 					break;
 				}
 			}
-			//outputSignals[0]->bufferPut(value);
-			printf("%d Signal Received!!!\n", k + 1);
+			switch (type) {
+			case 1:
+				outputSignals[0]->bufferPut(valueBinary);
+				break;
+			case 2: 
+				outputSignals[0]->bufferPut(valueReal);
+				break;
+			case 3: 
+				outputSignals[0]->bufferPut(valueComplex);
+				break;
+			case 4:
+				outputSignals[0]->bufferPut(valueComplexXy);
+				break;
+
+			case 5:
+				outputSignals[0]->bufferPut(valueComplexMp);
+				break;
+			}
+
+			printf("%d Signal Received and sent to buffer\n", k + 1);
 		}
 
 		while (true) { Sleep(1000); }
