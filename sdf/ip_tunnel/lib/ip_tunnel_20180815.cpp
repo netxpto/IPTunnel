@@ -1,9 +1,7 @@
 # include "../../ip_tunnel/include/ip_tunnel_20180815.h" 
 
-#pragma warning(disable:4996) //inet_addr() is deprecated, only way to use it
 #include <WS2tcpip.h> //official windows header with some functions neededd, 
 #pragma comment(lib, "ws2_32.lib") //link the winsock library file, can also link Settings->linker->Additional dependency
-
 
 SOCKET clientSocket;
 
@@ -15,13 +13,40 @@ void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
 			printf("Error opening server\n");
 			exit(1);
 		}
+		signalType = ipTunnelRecvInt();
+		printf("Type of signal received!\n");
 	}
 	else {
-		printf("cliente");
+		signal_value_type sType = inputSignals[0]->getValueType();
+		printf("client");
 		if (!client()) {
 			printf("Error opening client\n");
 			exit(1);
 		}
+		switch (sType) {
+			case signal_value_type::t_binary: //1
+				signalType = 1;
+				break;
+			case signal_value_type::t_real: //2
+				signalType = 2;
+				break;
+			case signal_value_type::t_complex: //3
+				signalType = 3;
+				break;
+			case signal_value_type::t_complex_xy: //4
+				signalType = 4;
+				break;
+
+			case signal_value_type::t_photon_mp_xy: //5
+				signalType = 5;
+				break;
+			default:
+				printf("Error getting signal type\n");
+				exit(1);
+		}
+		ipTunnelSendInt(signalType);
+		printf("Type of signal sent!\n");
+		
 	}
 }
 
@@ -31,9 +56,6 @@ bool IPTunnel::runBlock(void)
 	int ready;
 	int process;
 	
-	//client ------------> server
-
-	//no inicio do run deve atualizar as variavies ready e space (ipTunnelSpace()) process = min(ready, space)
 	if (inputSignals.empty()) { //server
 		
 		long space = outputSignals[0]->space();
@@ -53,8 +75,12 @@ bool IPTunnel::runBlock(void)
 		//----------------------------------------RECEIVING THE SIGNAL----------------------------------------
 
 
-		int process = ipTunnelRecvInt();
-		int type = ipTunnelRecvInt();
+		process = ipTunnelRecvInt();
+
+		if (process == 0) {
+			alive = false;
+			return false;
+		}
 
 		t_binary valueBinary;
 		t_real valueReal;
@@ -68,33 +94,31 @@ bool IPTunnel::runBlock(void)
 		char* recv_buffer = 0;
 
 		for (int k = 0; k < process; k++) {
-			switch (type) {
+			switch (signalType) {
 				case 1: //signal_value_type::t_binary:
-					printf("binary");
 					recv_buffer = (char*)&valueBinary;
 					remaining = sizeof(t_binary);
 					break;
 				case 2: //signal_value_type::t_real: 
-					printf("t_real");
 					recv_buffer = (char*)&valueReal;
 					remaining = sizeof(t_real);
 					break;
 				case 3: //signal_value_type::t_complex: 
-					printf("t_complex");
 					recv_buffer = (char*)&valueComplex;
 					remaining = sizeof(t_complex);
 					break;
 				case 4: //signal_value_type::t_complex_xy: 
-					printf("t_complex_xy");
 					recv_buffer = (char*)&valueComplexXy;
 					remaining = sizeof(t_complex_xy);
 					break;
 
 				case 5: //signal_value_type::t_photon_mp_xy:
-					printf("t_photon_mp_xy");
 					recv_buffer = (char*)&valueComplexMp;
 					remaining = sizeof(t_photon_mp_xy);
 					break;
+				default:
+					printf("Error getting signal type\n");
+					exit(1);
 			}
 
 			int received = 0;
@@ -116,30 +140,28 @@ bool IPTunnel::runBlock(void)
 					break;
 				}
 			}
-			switch (type) {
-			case 1:
-				outputSignals[0]->bufferPut(valueBinary);
-				break;
-			case 2: 
-				outputSignals[0]->bufferPut(valueReal);
-				break;
-			case 3: 
-				outputSignals[0]->bufferPut(valueComplex);
-				break;
-			case 4:
-				outputSignals[0]->bufferPut(valueComplexXy);
-				break;
-
-			case 5:
-				outputSignals[0]->bufferPut(valueComplexMp);
-				break;
+			switch (signalType) {
+				case 1:
+					outputSignals[0]->bufferPut(valueBinary);
+					break;
+				case 2: 
+					outputSignals[0]->bufferPut(valueReal);
+					break;
+				case 3: 
+					outputSignals[0]->bufferPut(valueComplex);
+					break;
+				case 4:
+					outputSignals[0]->bufferPut(valueComplexXy);
+					break;
+				case 5:
+					outputSignals[0]->bufferPut(valueComplexMp);
+					break;
+				default:
+					printf("Error putting signal in buffer due to signal type unknown\n");
+					exit(1);
 			}
-
-			printf("%d Signal Received and sent to buffer\n", k + 1);
 		}
-
-		while (true) { Sleep(1000); }
-
+		printf("Signal Received and sent to buffer\n");
 	}
 	else { //client
 		ready = inputSignals[0]->ready();
@@ -147,122 +169,89 @@ bool IPTunnel::runBlock(void)
 		
 		process = min((long int)ready, space);
 		ipTunnelSendInt(process);
+
+		if (process == 0) {
+			alive = false;
+			return false;
+		}
+
+
 		printf("space of received IPTunnel:%d\n", space);
 		printf("process:%d\n", process);
 
-		signal_value_type sType = inputSignals[0]->getValueType();
-		switch (sType) {
-			case signal_value_type::t_binary: //1
-				ipTunnelSendInt(1);
-				printf("binary");
+		switch (signalType) {
+			case 1:
 				for (int k = 0; k < process; k++) {
-					
 					t_binary signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
+					++sentSamples;
 				}
 				break;
-			case signal_value_type::t_real: //2
-				ipTunnelSendInt(2);
-				printf("t_real");
+			case 2:
 				for (int k = 0; k < process; k++) {
 					t_real signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
+					++sentSamples;
 				}
 				break;
-			case signal_value_type::t_complex: //3
-				ipTunnelSendInt(3);
-				printf("t_complex");
+			case 3:
 				for (int k = 0; k < process; k++) {
 					t_complex signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
+					++sentSamples;
 				}
 				break;
-			case signal_value_type::t_complex_xy: //4
-				ipTunnelSendInt(4);
-				printf("t_complex_xy");
+			case 4:
 				for (int k = 0; k < process; k++) {
 					t_complex_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
+					++sentSamples;
 				}
 				break;
 
-			case signal_value_type::t_photon_mp_xy: //5
-				ipTunnelSendInt(5);
-				printf("t_complex_mp_xy");
+			case 5:
 				for (int k = 0; k < process; k++) {
 					t_photon_mp_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
+					++sentSamples;
 				}
 				break;
-		}
-
-		while (true) { Sleep(1000); }
-	}
-
-
-	
-
-	
-	//std::cout << std::bitset<64>(ready);
-	
-	//ready = ready << 2;
-	
-	//int temp = ready;
-
-	cout << "---------------- IP Tunnel ----------------------\n";
-	cout << "---------------- IP Tunnel ----------------------\n";
-	printf("%d\n",ready);
-	printf("%d\n", numberOfSamples);
-	printf("%d\n", inputSignals[0]);
-	auto temp = inputSignals[0];
-	//int process;
-	if (numberOfSamples >= 0) {
-		process = min((long int)ready, numberOfSamples);
-	}
-	else {
-		process = ready;
-	}
-	printf("process:%d\n", process);
-	if (process == 0) {
-		alive = false;
-		//return alive; //blocked = true;
-	}
-	else {
-		outputSignals[0]->bufferPut((t_binary)ready); //process;
-		for (int i = 0; i < process; i++) {
-			inputSignals[0]->bufferGet();
-			++processedSamples;
+			default:
+				printf("Error sending signal due to signal type unknown\n");
+				exit(1);
 		}
 
 	}
-	printf("process:%d\n", process);
-
-	if (numberOfSamples >= 0) numberOfSamples -= process;
 
 	if (displayNumberOfSamples) {
-		cout << "ip tunnel Samples to receive: " << 0 << "\n";
-		cout << "ip tunnel Samples to send: " << process << "\n";
+		cout << "Samples to receive through IP Tunnel: " << 0 << "\n";
+		cout << "Samples to send: " << process << "\n";
 	}
-	printf("%d\n", inputSignals[0]);
-	
-	if (process == 0) {
+
+	//Client
+	/*
+	if (process == 0 && !alive) { //&& ready == 0
+		//SEND ALIVE TO SERVER
+		return false;
+	}
+	else if (process == 0) {
 		alive = false;
-		//update alive in the other block
+		return false;
+	}*/
 
-	}
-	else {
-
-	}
-
-	return false; //~(blocked); // & entangledBlocked());
+	return true; 
 	
 }
 
+void IPTunnel::terminate(void) {
+	closesocket(clientSocket);
+	WSACleanup();
+}
 
 template <class T>
 int IPTunnel::ipTunnelPut(T object){
@@ -284,10 +273,7 @@ int IPTunnel::ipTunnelPut(T object){
 			// probably a good idea to close socket
 			break;
 		}
-		printf("Remaining to send:%d\n", remaining);
 	}
-
-
 
 	return 0;
 
@@ -365,7 +351,8 @@ bool IPTunnel::server() {
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = ntohs(tcpPort);
-	hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str()); // inet_addr("127.0.0.1");//Could also use inet_pton .... 
+	//hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str());
+	inet_pton(AF_INET, (PCSTR)ipAddressServer.c_str(), &hint.sin_addr.s_addr);// inet_addr("127.0.0.1");
 
 
 	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {
@@ -403,40 +390,9 @@ bool IPTunnel::server() {
 	}
 
 	// Close listening socket
-	closesocket(listening);
+	//closesocket(listening);
 
 	/*
-	// While loop: accept and echo message back to client
-	char buf[4096];
-
-	while (true)
-	{
-		ZeroMemory(buf, 4096);
-
-
-		int sen = send(clientSocket, (char*)&inputSignal, sizeof(inputSignal), 0);
-
-		// Wait for client to send data
-		int bytesReceived = recv(clientSocket, buf, 4096, 0);
-		if (bytesReceived == SOCKET_ERROR)
-		{
-			cerr << "Error in recv(). Quitting" << WSAGetLastError() << endl;
-			break;
-		}
-
-		if (bytesReceived == 0)
-		{
-			cout << "Client disconnected " << endl;
-			break;
-		}
-
-		cout << string(buf, 0, bytesReceived) << endl;
-
-		// Echo message back to client
-		send(clientSocket, buf, bytesReceived + 1, 0);
-
-	}
-
 	// Close the socket
 	closesocket(clientSocket);
 
