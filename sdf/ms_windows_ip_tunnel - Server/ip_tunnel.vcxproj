@@ -118,14 +118,15 @@
     <ClCompile Include="..\..\lib\binary_source_20180815.cpp" />
     <ClCompile Include="..\..\lib\netxpto_20180815.cpp" />
     <ClCompile Include="..\..\lib\sink_20180815.cpp" />
-    <ClCompile Include="ip_tunnel_sdf.cpp" />
-    <ClCompile Include="lib\ip_tunnel_20180815.cpp" />
+    <ClCompile Include="ms_windows_ip_tunnel_sdf.cpp" />
+    <ClCompile Include="lib\ms_windows_ip_tunnel_20180815.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\binary_source_20180815.h" />
     <ClInclude Include="..\..\include\netxpto_20180815.h" />
     <ClInclude Include="..\..\include\sink_20180815.h" />
     <ClInclude Include="include\ip_tunnel_20180815.h" />
+    <ClInclude Include="include\ms_windows_ip_tunnel_20180815.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

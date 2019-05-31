@@ -1,4 +1,4 @@
-# include "../../ip_tunnel/include/ip_tunnel_20180815.h" 
+# include "../include/ms_windows_ip_tunnel_20180815.h" 
 
 #include <WS2tcpip.h> //official windows header with some functions neededd, 
 #pragma comment(lib, "ws2_32.lib") //link the winsock library file, can also link Settings->linker->Additional dependency
@@ -14,7 +14,6 @@ void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
 			exit(1);
 		}
 		signalType = ipTunnelRecvInt();
-		printf("Type of signal received!\n");
 	}
 	else {
 		signal_value_type sType = inputSignals[0]->getValueType();
@@ -45,7 +44,6 @@ void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
 				exit(1);
 		}
 		ipTunnelSendInt(signalType);
-		printf("Type of signal sent!\n");
 		
 	}
 }
@@ -63,22 +61,22 @@ bool IPTunnel::runBlock(void)
 			long int aux = k->space();
 			space = min(space, aux);
 		}
-		printf("space:%d\n", space);
-		printf("sending space to client\n");
-
+		
+		
 		ipTunnelSendInt(space);
 
-		printf("Sent space!!!\n");
 
-
-		printf("waiting to receive the signal...\n");
+		//printf("waiting to receive the signal...\n");
 		//----------------------------------------RECEIVING THE SIGNAL----------------------------------------
 
 
 		process = ipTunnelRecvInt();
 
 		if (process == 0) {
-			alive = false;
+			//alive = false;
+			if (displayNumberOfSamples) {
+				cout << "Samples received through IP Tunnel: " << process << "\n";
+			}
 			return false;
 		}
 
@@ -161,7 +159,11 @@ bool IPTunnel::runBlock(void)
 					exit(1);
 			}
 		}
-		printf("Signal Received and sent to buffer\n");
+		//printf("Signal Received and sent to buffer\n");
+
+		if (displayNumberOfSamples) {
+			cout << "Samples received through IP Tunnel: " << process << "\n";;
+		}
 	}
 	else { //client
 		ready = inputSignals[0]->ready();
@@ -171,13 +173,15 @@ bool IPTunnel::runBlock(void)
 		ipTunnelSendInt(process);
 
 		if (process == 0) {
-			alive = false;
+			//alive = false;
+			if (displayNumberOfSamples) {
+				cout << "Samples sent through IP Tunnel: " << process << "\n";
+			}
 			return false;
 		}
 
-
-		printf("space of received IPTunnel:%d\n", space);
-		printf("process:%d\n", process);
+		//printf("space of received IPTunnel:%d\n", space);
+		//printf("process:%d\n", process);
 
 		switch (signalType) {
 			case 1:
@@ -185,7 +189,6 @@ bool IPTunnel::runBlock(void)
 					t_binary signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			case 2:
@@ -193,7 +196,6 @@ bool IPTunnel::runBlock(void)
 					t_real signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			case 3:
@@ -201,7 +203,6 @@ bool IPTunnel::runBlock(void)
 					t_complex signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			case 4:
@@ -209,7 +210,6 @@ bool IPTunnel::runBlock(void)
 					t_complex_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 
@@ -218,7 +218,6 @@ bool IPTunnel::runBlock(void)
 					t_photon_mp_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			default:
@@ -226,12 +225,12 @@ bool IPTunnel::runBlock(void)
 				exit(1);
 		}
 
+		if (displayNumberOfSamples) {
+			cout << "Samples sent through IP Tunnel: " << process << "\n";
+		}
+
 	}
 
-	if (displayNumberOfSamples) {
-		cout << "Samples to receive through IP Tunnel: " << 0 << "\n";
-		cout << "Samples to send: " << process << "\n";
-	}
 
 	//Client
 	/*
@@ -253,11 +252,9 @@ void IPTunnel::terminate(void) {
 	WSACleanup();
 }
 
+
 template <class T>
 int IPTunnel::ipTunnelPut(T object){
-
-	
-
 	char* tosend = (char*)&object;
 	int remaining = sizeof(object);
 	int result = 0;
@@ -328,7 +325,6 @@ int IPTunnel::ipTunnelRecvInt() {
 
 bool IPTunnel::server() {
 	//SERVER -------------------------------------------------------------------------
-	// Initialze winsock
 	WSADATA wsData;
 	WORD ver = MAKEWORD(2, 2);
 
@@ -352,7 +348,7 @@ bool IPTunnel::server() {
 	hint.sin_family = AF_INET;
 	hint.sin_port = ntohs(tcpPort);
 	//hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str());
-	inet_pton(AF_INET, (PCSTR)ipAddressServer.c_str(), &hint.sin_addr.s_addr);// inet_addr("127.0.0.1");
+	inet_pton(AF_INET, (PCSTR)"127.0.0.1", &hint.sin_addr.s_addr);// inet_addr("127.0.0.1");
 
 
 	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {
@@ -429,7 +425,7 @@ bool IPTunnel::client() {
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(tcpPort);
-	inet_pton(AF_INET, ipAddressServer.c_str(), &hint.sin_addr);
+	inet_pton(AF_INET, remoteMachineIpAddress.c_str(), &hint.sin_addr);
 
 	// Connect to server
 	int connResult = -2;
@@ -444,7 +440,7 @@ bool IPTunnel::client() {
 			//return false;
 		}
 
-		Sleep(3000);
+		Sleep(3*1000);
 	}
 	cout << "Connected!\n";
 	/*

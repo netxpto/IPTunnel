@@ -1,5 +1,5 @@
-# ifndef IP_TUNNEL_H_
-# define IP_TUNNEL_H_
+# ifndef MS_WINDOWS_IP_TUNNEL_H_
+# define MS_WINDOWS_IP_TUNNEL_H_
 
 # include "../include/netxpto_20180815.h"
 
@@ -34,16 +34,14 @@ public:
 private:
 
 	// # Input Parameters ########################################################
-	long int sentSamples{ 0 };
-	bool displayNumberOfSamples{ true};
-	string ipAddressServer{ "127.0.0.1" };
+	bool displayNumberOfSamples{ true };
+	string remoteMachineIpAddress{ "127.0.0.1" };
 	int tcpPort{ 54000 };
-	int numberOfTrials{ 5 };
-	int numberOfRepetions{ 3 };
+	int numberOfTrials{ 10 };
 	int signalType{ 0 };
+	int timeIntervalSeconds{ 3 };
 
 	// # State Variables #########################################################
-	bool alive{ true };
 
 };
 

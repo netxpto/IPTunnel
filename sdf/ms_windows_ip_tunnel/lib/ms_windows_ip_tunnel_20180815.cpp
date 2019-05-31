@@ -1,14 +1,14 @@
-# include "../../ip_tunnel/include/ip_tunnel_20180815.h" 
+# include "../include/ms_windows_ip_tunnel_20180815.h" 
 
 #include <WS2tcpip.h> //official windows header with some functions neededd, 
 #pragma comment(lib, "ws2_32.lib") //link the winsock library file, can also link Settings->linker->Additional dependency
 
 SOCKET clientSocket;
 
-void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
+void IPTunnel::initialize(void)
 {
 	if (inputSignals.empty()) {
-		printf("server");
+		printf("server\n");
 		if (!server()) {
 			printf("Error opening server\n");
 			exit(1);
@@ -17,7 +17,7 @@ void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
 	}
 	else {
 		signal_value_type sType = inputSignals[0]->getValueType();
-		printf("client");
+		printf("client\n");
 		if (!client()) {
 			printf("Error opening client\n");
 			exit(1);
@@ -44,15 +44,13 @@ void IPTunnel::initialize(void)  //crie aqui o servidor e o cliente
 				exit(1);
 		}
 		ipTunnelSendInt(signalType);
-		
 	}
 }
 
 
 bool IPTunnel::runBlock(void)
 {
-	int ready;
-	int process;
+	int ready, process;
 	
 	if (inputSignals.empty()) { //server
 		
@@ -61,19 +59,15 @@ bool IPTunnel::runBlock(void)
 			long int aux = k->space();
 			space = min(space, aux);
 		}
-		
-		
+
 		ipTunnelSendInt(space);
 
-
-		//printf("waiting to receive the signal...\n");
 		//----------------------------------------RECEIVING THE SIGNAL----------------------------------------
-
 
 		process = ipTunnelRecvInt();
 
 		if (process == 0) {
-			alive = false;
+			//alive = false;
 			if (displayNumberOfSamples) {
 				cout << "Samples received through IP Tunnel: " << process << "\n";
 			}
@@ -109,7 +103,6 @@ bool IPTunnel::runBlock(void)
 					recv_buffer = (char*)&valueComplexXy;
 					remaining = sizeof(t_complex_xy);
 					break;
-
 				case 5: //signal_value_type::t_photon_mp_xy:
 					recv_buffer = (char*)&valueComplexMp;
 					remaining = sizeof(t_photon_mp_xy);
@@ -159,10 +152,8 @@ bool IPTunnel::runBlock(void)
 					exit(1);
 			}
 		}
-		//printf("Signal Received and sent to buffer\n");
-
 		if (displayNumberOfSamples) {
-			cout << "Samples received through IP Tunnel: " << process << "\n";;
+			cout << "Samples received through IP Tunnel: " << process << "\n";
 		}
 	}
 	else { //client
@@ -173,15 +164,12 @@ bool IPTunnel::runBlock(void)
 		ipTunnelSendInt(process);
 
 		if (process == 0) {
-			alive = false;
+			//alive = false;
 			if (displayNumberOfSamples) {
-				cout << "Samples sent through IP Tunnel: " << process << "\n";
+				cout << "Samples sent through IP Tunne: " << process << "\n";
 			}
 			return false;
 		}
-
-		//printf("space of received IPTunnel:%d\n", space);
-		//printf("process:%d\n", process);
 
 		switch (signalType) {
 			case 1:
@@ -189,7 +177,6 @@ bool IPTunnel::runBlock(void)
 					t_binary signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			case 2:
@@ -197,7 +184,6 @@ bool IPTunnel::runBlock(void)
 					t_real signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			case 3:
@@ -205,7 +191,6 @@ bool IPTunnel::runBlock(void)
 					t_complex signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			case 4:
@@ -213,7 +198,6 @@ bool IPTunnel::runBlock(void)
 					t_complex_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 
@@ -222,20 +206,16 @@ bool IPTunnel::runBlock(void)
 					t_photon_mp_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
-					++sentSamples;
 				}
 				break;
 			default:
 				printf("Error sending signal due to signal type unknown\n");
 				exit(1);
 		}
-
 		if (displayNumberOfSamples) {
-			cout << "Samples sent through IP Tunnel: " << process << "\n";
+			cout << "Samples sent through IP Tunne: " << process << "\n";
 		}
-
 	}
-
 
 	//Client
 	/*
@@ -249,14 +229,12 @@ bool IPTunnel::runBlock(void)
 	}*/
 
 	return true; 
-	
 }
 
 void IPTunnel::terminate(void) {
 	closesocket(clientSocket);
 	WSACleanup();
 }
-
 
 template <class T>
 int IPTunnel::ipTunnelPut(T object){
@@ -276,9 +254,7 @@ int IPTunnel::ipTunnelPut(T object){
 			break;
 		}
 	}
-
 	return 0;
-
 }
 
 
@@ -329,7 +305,6 @@ int IPTunnel::ipTunnelRecvInt() {
 }
 
 bool IPTunnel::server() {
-	//SERVER -------------------------------------------------------------------------
 	WSADATA wsData;
 	WORD ver = MAKEWORD(2, 2);
 
@@ -340,7 +315,6 @@ bool IPTunnel::server() {
 		return false;
 	}
 
-	// Create a socket
 	SOCKET listening = socket(AF_INET, SOCK_STREAM, 0);
 	if (listening == INVALID_SOCKET)
 	{
@@ -348,35 +322,31 @@ bool IPTunnel::server() {
 		return false;
 	}
 
-	// Bind the ip address and port to a socket
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = ntohs(tcpPort);
-	//hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str());
-	inet_pton(AF_INET, (PCSTR)ipAddressServer.c_str(), &hint.sin_addr.s_addr);// inet_addr("127.0.0.1");
+	inet_pton(AF_INET, (PCSTR)remoteMachineIpAddress.c_str(), &hint.sin_addr.s_addr); // hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str());
 
 
 	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {
 		printf("\n ERROR on binding");
 		return false;
 	}
-	// Tell Winsock the socket is for listening 
-
 
 	if (listen(listening, SOMAXCONN) == -1) {
 		printf("\n ERROR on binding");
 		return false;
 	}
-	// Wait for a connection
+	
 	sockaddr_in client;
 	int clientSize = sizeof(client);
 
 	clientSocket = accept(listening, (sockaddr*)&client, &clientSize);
 
-	char host[NI_MAXHOST];		// Client's remote name
-	char service[NI_MAXSERV];	// Service (i.e. port) the client is connect on
+	char host[NI_MAXHOST];
+	char service[NI_MAXSERV];
 
-	ZeroMemory(host, NI_MAXHOST); // same as memset(host, 0, NI_MAXHOST);
+	ZeroMemory(host, NI_MAXHOST);
 	ZeroMemory(service, NI_MAXSERV);
 	
 	if (getnameinfo((sockaddr*)&client, sizeof(client), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
@@ -389,25 +359,11 @@ bool IPTunnel::server() {
 		cout << host << " connected on port " <<
 			ntohs(client.sin_port) << endl;
 	}
-
-	// Close listening socket
-	//closesocket(listening);
-
-	/*
-	// Close the socket
-	closesocket(clientSocket);
-
-	// Cleanup winsock
-	WSACleanup();
-
-	system("pause");*/
-	//SERVER -------------------------------------------------------------------------
+	return true;
 }
 
 bool IPTunnel::client() {
-	//CLIENTE -------------------------------------------------------------------------
 
-	// Initialize WinSock
 	WSAData data;
 	WORD ver = MAKEWORD(2, 2);
 	int wsResult = WSAStartup(ver, &data);
@@ -417,7 +373,6 @@ bool IPTunnel::client() {
 		return false;
 	}
 
-	// Create socket
 	clientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (clientSocket == INVALID_SOCKET)
 	{
@@ -426,63 +381,26 @@ bool IPTunnel::client() {
 		return false;
 	}
 
-	// Fill in a hint structure
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = htons(tcpPort);
-	inet_pton(AF_INET, ipAddressServer.c_str(), &hint.sin_addr);
+	inet_pton(AF_INET, remoteMachineIpAddress.c_str(), &hint.sin_addr);
 
-	// Connect to server
 	int connResult = -2;
-	while (connResult != 0 ) {
+	while (connResult != 0 || numberOfTrials == 0) {
 		connResult = connect(clientSocket, (sockaddr*)&hint, sizeof(hint));
-		printf("%d\n", connResult);
 		if (connResult == SOCKET_ERROR)
 		{
 			cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
-			//closesocket(sock);
-			//WSACleanup();
-			//return false;
 		}
-
-		Sleep(3*1000);
+		cerr << "Waiting " << timeIntervalSeconds << " seconds." << endl;
+		Sleep(timeIntervalSeconds * 1000);
+		;
+		if (--numberOfTrials == 0) {
+			cerr << "Reached maximum number of attempts." << endl;
+			return false;
+		}
 	}
 	cout << "Connected!\n";
-	/*
-	// Do-while loop to send and receive data
-	char buf[4096];
-	string userInput;
-
-	do
-	{
-		// Prompt the user for some text
-		cout << "> ";
-		getline(cin, userInput);
-
-		if (userInput.size() > 0)		// Make sure the user has typed in something
-		{
-			// Send the text
-			int sendResult = send(sock, userInput.c_str(), userInput.size() + 1, 0);
-			if (sendResult != SOCKET_ERROR)
-			{
-				// Wait for response
-				ZeroMemory(buf, 4096);
-				int bytesReceived = recv(sock, buf, 4096, 0);
-				if (bytesReceived > 0)
-				{
-					// Echo response to console
-					cout << "SERVER> " << string(buf, 0, bytesReceived) << endl;
-				}
-			}
-			else {
-				cerr << "Got no reply, Err #" << WSAGetLastError() << endl;
-			}
-		}
-
-	} while (userInput.size() > 0);
-
-	// Gracefully close down everything
-	closesocket(sock);
-	WSACleanup();*/
-	//CLIENTE ---------------------------------------------------------------
+	return true;
 }
