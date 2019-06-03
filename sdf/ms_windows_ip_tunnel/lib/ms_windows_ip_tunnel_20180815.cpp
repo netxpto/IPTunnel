@@ -324,7 +324,8 @@ bool IPTunnel::server() {
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
 	hint.sin_port = ntohs(tcpPort);
-	inet_pton(AF_INET, (PCSTR)remoteMachineIpAddress.c_str(), &hint.sin_addr.s_addr); // hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str());
+	//inet_pton(AF_INET, (PCSTR)remoteMachineIpAddress.c_str(), &hint.sin_addr.s_addr); // hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str());
+	hint.sin_addr.S_un.S_addr = INADDR_ANY;
 
 
 	if (::bind(listening, (sockaddr*)&hint, sizeof(hint)) < 0) {
@@ -391,13 +392,14 @@ bool IPTunnel::client() {
 		if (connResult == SOCKET_ERROR)
 		{
 			cerr << "Can't connect to server, Err #" << WSAGetLastError() << endl;
+			cerr << "Waiting " << timeIntervalSeconds << " seconds." << endl;
 		}
-		cerr << "Waiting " << timeIntervalSeconds << " seconds." << endl;
+		
 		Sleep(timeIntervalSeconds * 1000);
 		;
 		if (--numberOfTrials == 0) {
 			cerr << "Reached maximum number of attempts." << endl;
-			return false;
+			exit(1);
 		}
 	}
 	cout << "Connected!\n";
