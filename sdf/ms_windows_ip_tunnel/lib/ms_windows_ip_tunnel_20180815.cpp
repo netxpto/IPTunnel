@@ -1,7 +1,6 @@
 # include "../include/ms_windows_ip_tunnel_20180815.h" 
 
-#include <WS2tcpip.h> //official windows header with some functions neededd, 
-#pragma comment(lib, "ws2_32.lib") //link the winsock library file, can also link Settings->linker->Additional dependency
+#include <WS2tcpip.h> //official windows header with some functions needed
 
 SOCKET clientSocket;
 
