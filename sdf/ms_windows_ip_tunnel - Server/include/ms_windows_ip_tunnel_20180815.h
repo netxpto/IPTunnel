@@ -34,7 +34,7 @@ public:
 private:
 
 	// # Input Parameters ########################################################
-	bool displayNumberOfSamples{ true};
+	bool displayNumberOfSamples{ true };
 	string remoteMachineIpAddress{ "127.0.0.1" };
 	int tcpPort{ 54000 };
 	int numberOfTrials{ 10 };

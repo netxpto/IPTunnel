@@ -35,7 +35,6 @@ void IPTunnel::initialize(void)
 			case signal_value_type::t_complex_xy: //4
 				signalType = 4;
 				break;
-
 			case signal_value_type::t_photon_mp_xy: //5
 				signalType = 5;
 				break;
