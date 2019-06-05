@@ -41,9 +41,6 @@
     <ClInclude Include="..\..\include\sink_20180815.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ip_tunnel_20180815.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\ms_windows_ip_tunnel_20180815.h">
       <Filter>Header Files</Filter>
     </ClInclude>

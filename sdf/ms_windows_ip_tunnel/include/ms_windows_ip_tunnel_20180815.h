@@ -38,10 +38,11 @@ private:
 	string remoteMachineIpAddress{ "192.168.1.5" };
 	int tcpPort{ 54000 };
 	int numberOfTrials{ 10 };
-	int signalType{ 0 };
 	int timeIntervalSeconds{ 3 };
 
 	// # State Variables #########################################################
+
+	int signalType{ 0 };
 
 };
 
