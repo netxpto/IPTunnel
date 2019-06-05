@@ -1,5 +1,5 @@
-# ifndef IP_TUNNEL_H_
-# define IP_TUNNEL_H_
+# ifndef MS_WINDOWS_IP_TUNNEL_H_
+# define MS_WINDOWS_IP_TUNNEL_H_
 
 # include "../include/netxpto_20180815.h"
 
@@ -13,6 +13,7 @@ public:
 
 	void initialize(void);
 	bool runBlock(void);
+	void terminate(void);
 
 	void ipTunnelSendInt(int space);
 	int ipTunnelRecvInt();
@@ -21,12 +22,6 @@ public:
 	int ipTunnelPut(T object);
 
 	// ##########################################################################
-
-	void setNumberOfSamples(long int nOfSamples) { numberOfSamples = nOfSamples; };
-	long int getNumberOfSamples() const { return numberOfSamples; };
-
-	void setProcessedSamples(long int pSamples) { processedSamples = pSamples; };
-	long int getProcessedSamples() const { return processedSamples; };
 
 	void setDisplayNumberOfSamples(bool opt) { displayNumberOfSamples = opt; };
 	bool getDisplayNumberOfSamples() const { return displayNumberOfSamples; };
@@ -39,18 +34,14 @@ public:
 private:
 
 	// # Input Parameters ########################################################
-	long int numberOfSamples{ -1 };
-	long int processedSamples{ 0 };
-	bool displayNumberOfSamples{ true};
-	//const char* ipAddressServer{ "127.0.0.1" };
-	string ipAddressServer{ "127.0.0.1" };
+	bool displayNumberOfSamples{ true };
+	string remoteMachineIpAddress{ "192.168.1.5" };
 	int tcpPort{ 54000 };
-	int numberOfTrials{ 5 };
-	int numberOfRepetions{ 3 };
+	int numberOfTrials{ 10 };
+	int signalType{ 0 };
+	int timeIntervalSeconds{ 3 };
 
 	// # State Variables #########################################################
-	bool alive{ true };
-	bool finished{ false };
 
 };
 

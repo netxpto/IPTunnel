@@ -24,10 +24,10 @@
     <ClCompile Include="..\..\lib\binary_source_20180815.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ip_tunnel_sdf.cpp">
+    <ClCompile Include="lib\ms_windows_ip_tunnel_20180815.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="lib\ip_tunnel_20180815.cpp">
+    <ClCompile Include="ms_windows_ip_tunnel_sdf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,7 +41,7 @@
     <ClInclude Include="..\..\include\sink_20180815.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ip_tunnel_20180815.h">
+    <ClInclude Include="include\ms_windows_ip_tunnel_20180815.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
