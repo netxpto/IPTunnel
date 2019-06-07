@@ -26,8 +26,21 @@ public:
 	void setDisplayNumberOfSamples(bool opt) { displayNumberOfSamples = opt; };
 	bool getDisplayNumberOfSamples() const { return displayNumberOfSamples; };
 
+	void setRemoteMachineIpAddress(string rMachineIpAddress) { remoteMachineIpAddress = rMachineIpAddress; };
+	string getRemoteMachineIpAddress() const { return remoteMachineIpAddress; };
+
+	void setTcpPort(int tcpP) { tcpPort = tcpP; };
+	int getTcpPort() const { return tcpPort; };
+
+	void setNumberOfTrials(int nOfTrials) { numberOfTrials = nOfTrials; };
+	int getNumberOfTrials() const { return numberOfTrials; };
+
+	void setTimeIntervalSeconds(int tIntervalSeconds) { timeIntervalSeconds = tIntervalSeconds; };
+	int getTimeIntervalSeconds() const { return timeIntervalSeconds; };
+
 	bool server();
 	bool client();
+
 
 	// ###########################################################################
 	
@@ -35,13 +48,10 @@ private:
 
 	// # Input Parameters ########################################################
 	bool displayNumberOfSamples{ true };
-	string remoteMachineIpAddress{ "192.168.1.5" };
+	string remoteMachineIpAddress{ "127.0.0.1" };
 	int tcpPort{ 54000 };
 	int numberOfTrials{ 10 };
-	int signalType{ 0 };
 	int timeIntervalSeconds{ 3 };
-
-	// # State Variables #########################################################
 
 };
 

@@ -12,36 +12,13 @@ void IPTunnel::initialize(void)
 			printf("Error opening server\n");
 			exit(1);
 		}
-		signalType = ipTunnelRecvInt();
 	}
 	else {
-		signal_value_type sType = inputSignals[0]->getValueType();
 		printf("client\n");
 		if (!client()) {
 			printf("Error opening client\n");
 			exit(1);
 		}
-		switch (sType) {
-			case signal_value_type::t_binary: //1
-				signalType = 1;
-				break;
-			case signal_value_type::t_real: //2
-				signalType = 2;
-				break;
-			case signal_value_type::t_complex: //3
-				signalType = 3;
-				break;
-			case signal_value_type::t_complex_xy: //4
-				signalType = 4;
-				break;
-			case signal_value_type::t_photon_mp_xy: //5
-				signalType = 5;
-				break;
-			default:
-				printf("Error getting signal type\n");
-				exit(1);
-		}
-		ipTunnelSendInt(signalType);
 	}
 }
 
@@ -82,26 +59,26 @@ bool IPTunnel::runBlock(void)
 		int result = 0;
 		int remaining;
 		char* recv_buffer = 0;
-
+		signal_value_type sType = outputSignals[0]->getValueType();
 		for (int k = 0; k < process; k++) {
-			switch (signalType) {
-				case 1: //signal_value_type::t_binary:
+			switch (sType) {
+				case signal_value_type::t_binary:
 					recv_buffer = (char*)&valueBinary;
 					remaining = sizeof(t_binary);
 					break;
-				case 2: //signal_value_type::t_real: 
+				case signal_value_type::t_real: 
 					recv_buffer = (char*)&valueReal;
 					remaining = sizeof(t_real);
 					break;
-				case 3: //signal_value_type::t_complex: 
+				case signal_value_type::t_complex: 
 					recv_buffer = (char*)&valueComplex;
 					remaining = sizeof(t_complex);
 					break;
-				case 4: //signal_value_type::t_complex_xy: 
+				case signal_value_type::t_complex_xy: 
 					recv_buffer = (char*)&valueComplexXy;
 					remaining = sizeof(t_complex_xy);
 					break;
-				case 5: //signal_value_type::t_photon_mp_xy:
+				case signal_value_type::t_photon_mp_xy:
 					recv_buffer = (char*)&valueComplexMp;
 					remaining = sizeof(t_photon_mp_xy);
 					break;
@@ -129,20 +106,21 @@ bool IPTunnel::runBlock(void)
 					break;
 				}
 			}
-			switch (signalType) {
-				case 1:
+			
+			switch (sType) {
+				case signal_value_type::t_binary:
 					outputSignals[0]->bufferPut(valueBinary);
 					break;
-				case 2: 
+				case signal_value_type::t_real:
 					outputSignals[0]->bufferPut(valueReal);
 					break;
-				case 3: 
+				case signal_value_type::t_complex:
 					outputSignals[0]->bufferPut(valueComplex);
 					break;
-				case 4:
+				case signal_value_type::t_complex_xy:
 					outputSignals[0]->bufferPut(valueComplexXy);
 					break;
-				case 5:
+				case signal_value_type::t_photon_mp_xy:
 					outputSignals[0]->bufferPut(valueComplexMp);
 					break;
 				default:
@@ -164,34 +142,34 @@ bool IPTunnel::runBlock(void)
 		if (process == 0) {
 			//alive = false;
 			if (displayNumberOfSamples) {
-				cout << "Samples sent through IP Tunne: " << process << "\n";
+				cout << "Samples sent through IP Tunnel: " << process << "\n";
 			}
 			return false;
 		}
-
-		switch (signalType) {
-			case 1:
+		signal_value_type sType = inputSignals[0]->getValueType();
+		switch (sType) {
+			case signal_value_type::t_binary:
 				for (int k = 0; k < process; k++) {
 					t_binary signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
 				}
 				break;
-			case 2:
+			case signal_value_type::t_real:
 				for (int k = 0; k < process; k++) {
 					t_real signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
 				}
 				break;
-			case 3:
+			case signal_value_type::t_complex:
 				for (int k = 0; k < process; k++) {
 					t_complex signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
 				}
 				break;
-			case 4:
+			case signal_value_type::t_complex_xy:
 				for (int k = 0; k < process; k++) {
 					t_complex_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
@@ -199,7 +177,7 @@ bool IPTunnel::runBlock(void)
 				}
 				break;
 
-			case 5:
+			case signal_value_type::t_photon_mp_xy:
 				for (int k = 0; k < process; k++) {
 					t_photon_mp_xy signalValue;
 					inputSignals[0]->bufferGet(&signalValue);
@@ -211,21 +189,9 @@ bool IPTunnel::runBlock(void)
 				exit(1);
 		}
 		if (displayNumberOfSamples) {
-			cout << "Samples sent through IP Tunne: " << process << "\n";
+			cout << "Samples sent through IP Tunnel: " << process << "\n";
 		}
 	}
-
-	//Client
-	/*
-	if (process == 0 && !alive) { //&& ready == 0
-		//SEND ALIVE TO SERVER
-		return false;
-	}
-	else if (process == 0) {
-		alive = false;
-		return false;
-	}*/
-
 	return true; 
 }
 
