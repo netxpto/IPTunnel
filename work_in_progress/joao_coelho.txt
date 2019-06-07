@@ -4,6 +4,16 @@ Tasks:
 	3) interface gráfica para o BB84
 
 
+2019-06-07
+
+	colocar a funcionar nos PCs do laboratório com o sistema do Andoni, sem emulador de canal
+
+	analisar, documentar e apresentar uma solução para a interligação com maquinas entre redes IP distintas
+	https://www.cis.upenn.edu/~bcpierce/unison/docs.html
+
+
+next meeting: 14/6, 18h
+
 2019-06-05
 
 	- conlcuir a documentação
