@@ -54,6 +54,7 @@ bool IPTunnel::runBlock(void)
 		t_complex valueComplex;
 		t_complex_xy valueComplexXy;
 		t_photon_mp_xy valueComplexMp;
+		t_message valueMessage;
 
 
 		int result = 0;
@@ -81,6 +82,10 @@ bool IPTunnel::runBlock(void)
 				case signal_value_type::t_photon_mp_xy:
 					recv_buffer = (char*)&valueComplexMp;
 					remaining = sizeof(t_photon_mp_xy);
+					break;
+				case signal_value_type::t_message:
+					recv_buffer = (char*)&valueMessage;
+					remaining = sizeof(t_message);
 					break;
 				default:
 					printf("Error getting signal type\n");
@@ -122,6 +127,10 @@ bool IPTunnel::runBlock(void)
 					break;
 				case signal_value_type::t_photon_mp_xy:
 					outputSignals[0]->bufferPut(valueComplexMp);
+					break;
+				case signal_value_type::t_message:
+					recv_buffer = (char*)&valueMessage;
+					remaining = sizeof(t_message);
 					break;
 				default:
 					printf("Error putting signal in buffer due to signal type unknown\n");
@@ -183,6 +192,10 @@ bool IPTunnel::runBlock(void)
 					inputSignals[0]->bufferGet(&signalValue);
 					ipTunnelPut(signalValue);
 				}
+				break;
+			case signal_value_type::t_message:
+				recv_buffer = (char*)&valueMessage;
+				remaining = sizeof(t_message);
 				break;
 			default:
 				printf("Error sending signal due to signal type unknown\n");
