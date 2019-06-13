@@ -194,8 +194,11 @@ bool IPTunnel::runBlock(void)
 				}
 				break;
 			case signal_value_type::t_message:
-				recv_buffer = (char*)&valueMessage;
-				remaining = sizeof(t_message);
+				for (int k = 0; k < process; k++) {
+					t_message signalValue;
+					inputSignals[0]->bufferGet(&signalValue);
+					ipTunnelPut(signalValue);
+				}
 				break;
 			default:
 				printf("Error sending signal due to signal type unknown\n");
