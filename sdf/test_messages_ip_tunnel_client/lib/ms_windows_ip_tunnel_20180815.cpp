@@ -99,7 +99,7 @@ bool IPTunnel::runBlock(void)
 
 				remainingBufferType = sizeof(t_message_type);
 				remainingBufferDataLength = sizeof(t_message_data_length);
-				remaining = sizeof(t_message_data);
+				//remaining = sizeof(t_message_data);//(t_message_data);
 
 				break;
 			default:
@@ -147,6 +147,8 @@ bool IPTunnel::runBlock(void)
 						break;
 					}
 				}
+
+				remaining = valueMDataLength;
 			}
 			
 			int received = 0;
@@ -175,11 +177,15 @@ bool IPTunnel::runBlock(void)
 			//std::stringstream messageData;
 			//std::copy(valueMData.begin(), valueMData.end(), std::ostream_iterator<int>(messageData, " "));
 
-			t_message messageToSend{
-				std::to_string(valueMType),
-				std::to_string(valueMDataLength),
-				//messageData.str()
-			};
+			t_message messageToSend;
+
+			printf("ERROR!1\n");
+
+			messageToSend.messageData = MessageProcessors::generateMessageData(valueMData, valueMType);
+			messageToSend.messageDataLength = to_string((t_message_data_length)valueMDataLength);
+			messageToSend.messageType = valueMType;
+			//messageToSend.messageType = '\0';
+			printf("ERROR!2\n");
 
 			
 			switch (sType) {
@@ -199,8 +205,9 @@ bool IPTunnel::runBlock(void)
 					outputSignals[0]->bufferPut(valueComplexMp);
 					break;
 				case signal_value_type::t_message:
+					printf("ERROR!3\n");
 					outputSignals[0]->bufferPut(messageToSend);
-
+					printf("ERROR!4\n");
 					break;
 				default:
 					printf("Error putting signal in buffer due to signal type unknown\n");

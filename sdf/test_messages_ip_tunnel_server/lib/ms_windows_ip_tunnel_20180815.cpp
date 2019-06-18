@@ -99,16 +99,15 @@ bool IPTunnel::runBlock(void)
 
 				remainingBufferType = sizeof(t_message_type);
 				remainingBufferDataLength = sizeof(t_message_data_length);
-				remaining = sizeof(t_message_data);
+				//remaining = sizeof(t_message_data);
 
 				break;
 			default:
 				printf("Error getting signal type\n");
 				::exit(1);
 			}
-			printf("cocó\n");
+
 			if (sType == signal_value_type::t_message) { 
-				printf("xixi\n");
 				int received = 0;//receiving message type
 				result = 0;
 				while (remainingBufferType > 0) {
@@ -148,6 +147,7 @@ bool IPTunnel::runBlock(void)
 						break;
 					}
 				}
+				remaining = valueMDataLength;
 			}
 			
 			int received = 0;
@@ -170,15 +170,23 @@ bool IPTunnel::runBlock(void)
 				}
 			}
 
-			std::stringstream messageData;
-			std::copy(valueMData.begin(), valueMData.end(), std::ostream_iterator<int>(messageData, " "));
 
-			t_message messageToSend{
-				std::to_string(valueMType),
-				std::to_string(valueMDataLength),
-				messageData.str()
-			};
+			//reconstructing message again
 
+			//std::stringstream messageData;
+			//std::copy(valueMData.begin(), valueMData.end(), std::ostream_iterator<int>(messageData, " "));
+
+			t_message messageToSend;
+
+			printf("ERROR!1\n");
+
+			messageToSend.messageData = MessageProcessors::generateMessageData(valueMData, valueMType);
+			messageToSend.messageDataLength = to_string((t_message_data_length)valueMDataLength);
+			messageToSend.messageType = valueMType;
+			//messageToSend.messageType = '\0';
+			printf("ERROR!2\n");
+
+			
 			switch (sType) {
 				case signal_value_type::t_binary:
 					outputSignals[0]->bufferPut(valueBinary);
