@@ -10,6 +10,7 @@ Tasks:
 
 	analisar, documentar e apresentar uma solução para a interligação com maquinas entre redes IP distintas
 	https://www.cis.upenn.edu/~bcpierce/unison/docs.html
+	https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio.html
 
 
 next meeting: 14/6, 18h
