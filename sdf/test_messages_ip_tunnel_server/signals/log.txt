@@ -1,0 +1,229 @@
+The following input parameters were loaded from the configuration file:
+-----------------------------------------------------------------
+########## BinarySource ##########
+Block start time: 2019-06-18 02:25:37
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData3|space=512
+-----------------------------------------------------------------
+Elapsed time: 8 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData3|space=0
+
+
+-----------------------------------------------------------------
+########## BinarySource ##########
+Block start time: 2019-06-18 02:25:37
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData4|space=512
+-----------------------------------------------------------------
+Elapsed time: 10 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData4|space=0
+
+
+-----------------------------------------------------------------
+########## MessageProcessorReceiver ##########
+Block start time: 2019-06-18 02:25:37
+Input Signals: 
+MessageProcessorReceiver|sMessages1|ready=0
+Output Signals: 
+MessageProcessorReceiver|sFromMessageProc2|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+-----------------------------------------------------------------
+Elapsed time: 0 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+MessageProcessorReceiver|sMessages1|ready=0
+Output Signals: 
+MessageProcessorReceiver|sFromMessageProc2|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+
+
+-----------------------------------------------------------------
+########## IPTunnel ##########
+Block start time: 2019-06-18 02:25:37
+Input Signals: 
+IPTunnel|sMessages2|ready=0
+Output Signals: 
+-----------------------------------------------------------------
+Elapsed time: 2977 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+IPTunnel|sMessages2|ready=0
+Output Signals: 
+
+
+-----------------------------------------------------------------
+########## IPTunnel ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+Output Signals: 
+IPTunnel|sMessages1|space=512
+-----------------------------------------------------------------
+Elapsed time: 1 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+Output Signals: 
+IPTunnel|sMessages1|space=512
+
+
+-----------------------------------------------------------------
+########## BasisReconciliation ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+BasisReconciliation|sBinaryData3|ready=512
+BasisReconciliation|sBinaryData4|ready=512
+BasisReconciliation|sFromMessageProc2|ready=0
+Output Signals: 
+BasisReconciliation|Key3|space=512
+BasisReconciliation|Key4|space=512
+BasisReconciliation|sToMessage2|space=512
+-----------------------------------------------------------------
+Elapsed time: 6 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+BasisReconciliation|sBinaryData3|ready=1
+BasisReconciliation|sBinaryData4|ready=1
+BasisReconciliation|sFromMessageProc2|ready=0
+Output Signals: 
+BasisReconciliation|Key3|space=512
+BasisReconciliation|Key4|space=512
+BasisReconciliation|sToMessage2|space=0
+
+
+-----------------------------------------------------------------
+########## MessageProcessorTransmitter ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+MessageProcessorTransmitter|sToMessage2|ready=512
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+Output Signals: 
+MessageProcessorTransmitter|sMessages2|space=512
+-----------------------------------------------------------------
+Elapsed time: 4 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+MessageProcessorTransmitter|sToMessage2|ready=0
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+MessageProcessorTransmitter|sSignalToIgnore|ready=0
+Output Signals: 
+MessageProcessorTransmitter|sMessages2|space=511
+
+
+-----------------------------------------------------------------
+########## Sink ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+Sink|Key3|ready=0
+Output Signals: 
+-----------------------------------------------------------------
+Elapsed time: 0 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+Sink|Key3|ready=0
+Output Signals: 
+
+
+-----------------------------------------------------------------
+########## Sink ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+Sink|Key4|ready=0
+Output Signals: 
+-----------------------------------------------------------------
+Elapsed time: 0 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+Sink|Key4|ready=0
+Output Signals: 
+
+
+-----------------------------------------------------------------
+########## BinarySource ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData3|space=511
+-----------------------------------------------------------------
+Elapsed time: 5 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData3|space=0
+
+
+-----------------------------------------------------------------
+########## BinarySource ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData4|space=511
+-----------------------------------------------------------------
+Elapsed time: 5 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+Output Signals: 
+BinarySource|sBinaryData4|space=0
+
+
+-----------------------------------------------------------------
+########## MessageProcessorReceiver ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+MessageProcessorReceiver|sMessages1|ready=0
+Output Signals: 
+MessageProcessorReceiver|sFromMessageProc2|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+-----------------------------------------------------------------
+Elapsed time: 0 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+MessageProcessorReceiver|sMessages1|ready=0
+Output Signals: 
+MessageProcessorReceiver|sFromMessageProc2|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+MessageProcessorReceiver|sSignalToIgnore|space=512
+
+
+-----------------------------------------------------------------
+########## IPTunnel ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+IPTunnel|sMessages2|ready=1
+Output Signals: 
+-----------------------------------------------------------------
+Elapsed time: 2 milliseconds
+-----------------------------------------------------------------
+Input Signals: 
+IPTunnel|sMessages2|ready=0
+Output Signals: 
+
+
+-----------------------------------------------------------------
+########## IPTunnel ##########
+Block start time: 2019-06-18 02:25:40
+Input Signals: 
+Output Signals: 
+IPTunnel|sMessages1|space=512
