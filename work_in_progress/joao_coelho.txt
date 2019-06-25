@@ -4,6 +4,15 @@ Tasks:
 	3) interface gráfica para o BB84
 
 
+2019-06-25
+
+	1) alterar o nome de "ms_windows_ip_tunnel" para "ip_tunnel_ms_windows"
+	2) acabar a documentação detalhada, incluir também uma foto
+	3) pensar numa interface gráfica
+
+next meeting: 2/7, 13h30m
+
+
 2019-06-18
 
 	colocar o IpTunnel a funcionar para mensagens (documentar e reportar a partir de que tamanho de mensagens deixa de funcionar)
