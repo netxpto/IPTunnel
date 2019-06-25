@@ -54,15 +54,13 @@ bool MessageProcessorTransmitter::runBlock(void)
 		}
 
 		if (basisReconVector.size() == basisReconLength) {
-			string messageText = "";
-			for (unsigned int k = 0; k < basisReconVector.size(); ++k) {
-				messageText.append(to_string(basisReconVector[k]));
-			}
+			t_message_type msgType = BasisReconciliationMsg;
+			string messageText = MessageProcessors::generateMessageData(basisReconVector, msgType);
 
 			t_message messageBasisRecon;
 			messageBasisRecon.messageData = messageText;
 			messageBasisRecon.messageDataLength = to_string((t_message_data_length)messageText.size());
-			messageBasisRecon.messageType = t_message_type::BasisReconciliationMsg;
+			messageBasisRecon.messageType = msgType;
 
 			outputSignals[0]->bufferPut(messageBasisRecon);
 			basisReconVector.erase(basisReconVector.begin(), basisReconVector.end());
@@ -89,15 +87,13 @@ bool MessageProcessorTransmitter::runBlock(void)
 		}
 
 		if (ErrCorrParityVector.size() == ErrCorrParityLength) {
-			string messageText = "";
-			for (unsigned int  k = 0; k < ErrCorrParityVector.size(); ++k) {
-				messageText.append(to_string(ErrCorrParityVector[k]));
-			}
+			t_message_type msgType = ErrorCorrectionMsg;
+			string messageText = MessageProcessors::generateMessageData(ErrCorrParityVector, msgType);
 
 			t_message errCorrParityMsg;
 			errCorrParityMsg.messageData = messageText;
 			errCorrParityMsg.messageDataLength = to_string((t_message_data_length)messageText.size());
-			errCorrParityMsg.messageType = t_message_type::ErrorCorrectionMsg;
+			errCorrParityMsg.messageType = msgType;
 
 			outputSignals[0]->bufferPut(errCorrParityMsg);
 			ErrCorrParityVector.erase(ErrCorrParityVector.begin(), ErrCorrParityVector.end());
@@ -123,16 +119,13 @@ bool MessageProcessorTransmitter::runBlock(void)
 		}
 
 		if (ErrCorrPermVector.size() == ErrCorrPermLength) {
-			string messageText = "";
-			for (unsigned int  k = 0; k < ErrCorrPermVector.size(); ++k) {
-				messageText.append(to_string(ErrCorrPermVector[k]));
-				messageText.append("#");
-			}
+			t_message_type msgType = ErrorCorrectionPermutationsMsg;
+			string messageText = MessageProcessors::generateMessageData(ErrCorrPermVector, msgType);
 
 			t_message messageErrorCorrection;
 			messageErrorCorrection.messageData = messageText;
 			messageErrorCorrection.messageDataLength = to_string((t_message_data_length)messageText.size());
-			messageErrorCorrection.messageType = t_message_type::ErrorCorrectionPermutationsMsg;
+			messageErrorCorrection.messageType = msgType;
 
 			outputSignals[0]->bufferPut(messageErrorCorrection);
 			ErrCorrPermVector.erase(ErrCorrPermVector.begin(), ErrCorrPermVector.end());
@@ -158,17 +151,13 @@ bool MessageProcessorTransmitter::runBlock(void)
 		}
 
 		if (privacySeedsBVector.size() == privacySeedsLength) {
-			string messageText = "";
-
-			for (unsigned int  k = 0; k < privacySeedsBVector.size(); ++k) {
-				messageText.append(to_string((t_integer)privacySeedsBVector[k]));
-				messageText.append("#");
-			}
+			t_message_type msgType = PrivacyAmplificationSeedsMsg;
+			string messageText = MessageProcessors::generateMessageData(privacySeedsBVector, msgType);
 
 			t_message messagePASeeds;
 			messagePASeeds.messageData = messageText;
 			messagePASeeds.messageDataLength = to_string((t_message_data_length)messageText.size());
-			messagePASeeds.messageType = t_message_type::PrivacyAmplificationSeedsMsg;
+			messagePASeeds.messageType = msgType;
 
 			outputSignals[0]->bufferPut(messagePASeeds);
 			privacySeedsBVector.erase(privacySeedsBVector.begin(), privacySeedsBVector.end());
@@ -183,6 +172,7 @@ bool MessageProcessorTransmitter::runBlock(void)
 
 	if ((ready4 > 0) && (outputSignals[0]->space() > 0)) {
 		t_integer startIdx{ 0 };
+		t_message_type msgType = ParameterEstimationSeedAndBitsMsg;
 		if (!ParamEstStarted) {
 			inputSignals[4]->bufferGet(&paramEstLength);
 			ParamEstStarted = true;
@@ -196,19 +186,13 @@ bool MessageProcessorTransmitter::runBlock(void)
 		}
 
 		if (paramEstVector.size() == paramEstLength) {
-			string messageText = "";
-
-			messageText.append(to_string(paramEstVector[0]));
-			messageText.append("#");
-
-			for (unsigned int  k = 1; k < paramEstVector.size(); ++k) {
-				messageText.append(to_string(paramEstVector[k]));
-			}
+			
+			string messageText = MessageProcessors::generateMessageData(paramEstVector, msgType);
 
 			t_message messageParamEst;
 			messageParamEst.messageData = messageText;
 			messageParamEst.messageDataLength = to_string((t_message_data_length)messageText.size());
-			messageParamEst.messageType = t_message_type::ParameterEstimationSeedAndBitsMsg;
+			messageParamEst.messageType = msgType;
 
 			outputSignals[0]->bufferPut(messageParamEst);
 			paramEstVector.erase(paramEstVector.begin(), paramEstVector.end());
@@ -234,15 +218,13 @@ bool MessageProcessorTransmitter::runBlock(void)
 		}
 
 		if (ErrCorrBerVector.size() == ErrCorrBerLength) {
-			string messageText = "";
-			for (unsigned int  k = 0; k < ErrCorrBerVector.size(); ++k) {
-				messageText.append(to_string(ErrCorrBerVector[k]));
-			}
+			t_message_type msgType = ToggleBERChangeMsg;
+			string messageText = MessageProcessors::generateMessageData(ErrCorrBerVector, msgType);
 
 			t_message messageTBC;
 			messageTBC.messageData = messageText;
 			messageTBC.messageDataLength = to_string((t_message_data_length)messageText.size());
-			messageTBC.messageType = ToggleBERChangeMsg;
+			messageTBC.messageType = msgType;
 
 			outputSignals[0]->bufferPut(messageTBC);
 			ErrCorrBerVector.erase(ErrCorrBerVector.begin(), ErrCorrBerVector.end());

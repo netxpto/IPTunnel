@@ -161,4 +161,32 @@ namespace MessageProcessors {
 		return finishedReceiving;
 	}
 
+	string generateMessageData(const t_message_data &msgDataVal, const t_message_type &msgType) {
+		string msgDataString = "";
+		int start = 0;
+
+		if (msgType == t_message_type::ParameterEstimationSeedAndBitsMsg) {
+			msgDataString.append(to_string(msgDataVal[0]));
+			msgDataString.append("#");
+			start = 1;
+			for (unsigned int k = start; k < msgDataVal.size(); ++k) {
+				msgDataString.append(to_string(msgDataVal[k]));
+			}
+		}
+		else if ((msgType == t_message_type::PrivacyAmplificationSeedsMsg)
+			|| (msgType == t_message_type::ErrorCorrectionPermutationsMsg)) {
+			for (unsigned int k = 0; k < msgDataVal.size(); ++k) {
+				msgDataString.append(to_string(msgDataVal[k]));
+				msgDataString.append("#");
+			}
+		}
+		else {
+			for (unsigned int k = 0; k < msgDataVal.size(); ++k) {
+				msgDataString.append(to_string(msgDataVal[k]));
+			}
+		}
+		
+		return msgDataString;
+	}
 }
+
