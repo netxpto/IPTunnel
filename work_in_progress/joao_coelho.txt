@@ -7,8 +7,10 @@ Tasks:
 2019-06-25
 
 	1) alterar o nome de "ms_windows_ip_tunnel" para "ip_tunnel_ms_windows"
-	2) acabar a documentação detalhada, incluir também uma foto
-	3) pensar numa interface gráfica
+	2) acabar a documentação detalhada, incluir também uma foto, incluir um fluxograma com os passos que estão a ser dados de forma optimiarmos o sistema
+	3) analisar, documentar e apresentar uma solução para a interligação com maquinas entre redes IP distintas
+		https://www.cis.upenn.edu/~bcpierce/unison/docs.html
+	4) pensar e ir escrevendo numa interface gráfica (Alice/Bob, janela com as chaves 01001..., janema com os dados do protocolo, janela com o tcp)
 
 next meeting: 2/7, 13h30m
 
