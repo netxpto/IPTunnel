@@ -36,11 +36,10 @@ bool IPTunnel::runBlock(void)
 			long int aux = k->space();
 			space = min(space, aux);
 		}
-
+		
 		ipTunnelSendInt(space);
-
 		//----------------------------------------RECEIVING THE SIGNAL----------------------------------------
-
+		
 		process = ipTunnelRecvInt();
 
 		if (process == 0) {
@@ -61,7 +60,6 @@ bool IPTunnel::runBlock(void)
 		t_message_data_length valueMDataLength;
 		t_message_data valueMData;
 
-		t_message valueMessage; //not used
 
 
 		int result = 0;
@@ -94,18 +92,21 @@ bool IPTunnel::runBlock(void)
 				break;
 			case signal_value_type::t_message:
 				recv_bufferType = (char*)& valueMType;
-				recv_bufferDataLength = (char*)& valueMDataLength;
-				recv_buffer = (char*)& valueMData;
+				//recv_bufferDataLength = (char*)& valueMDataLength;
+				//recv_buffer = (char*)& valueMData;
 
 				remainingBufferType = sizeof(t_message_type);
 				remainingBufferDataLength = sizeof(t_message_data_length);
-				//remaining = sizeof(t_message_data);
+				//remaining = sizeof(t_message_data);//(t_message_data);
+
 
 				break;
 			default:
 				printf("Error getting signal type\n");
 				::exit(1);
 			}
+
+			string receivedString;
 
 			if (sType == signal_value_type::t_message) { 
 				int received = 0;//receiving message type
@@ -128,12 +129,21 @@ bool IPTunnel::runBlock(void)
 					}
 				}
 
-				received = 0;//receiving message dat length
+				valueMDataLength = ipTunnelRecvInt();
+
+
+				char msg[512];
+
+				remaining = valueMDataLength;//sizeof(msg);
+
+				recv_buffer = (char*)& msg;
+
+				received = 0;//receiving message data
 				result = 0;
-				while (remainingBufferDataLength > 0) {
-					result = recv(clientSocket, recv_bufferDataLength + received, remainingBufferDataLength, 0);
+				while (remaining > 0) {
+					result = recv(clientSocket, recv_buffer + received, remaining, 0);
 					if (result > 0) {
-						remainingBufferDataLength -= result;
+						remaining -= result;
 						received += result;
 					}
 					else if (result == 0) {
@@ -147,46 +157,40 @@ bool IPTunnel::runBlock(void)
 						break;
 					}
 				}
-				remaining = valueMDataLength;
-			}
-			
-			int received = 0;
-			result = 0;
-			while (remaining > 0) {
-				result = recv(clientSocket, recv_buffer + received, remaining, 0);
-				if (result > 0) {
-					remaining -= result;
-					received += result;
-				}
-				else if (result == 0) {
-					printf("Remote side closed his end of the connection before all data was received\n");
-					// probably a good idea to close socket
-					break;
-				}
-				else if (result < 0) {
-					printf("ERROR!\n");
-					// probably a good idea to close socket
-					break;
-				}
-			}
 
+				//msg[512 - (512 - valueMDataLength)] = 0;
 
+				receivedString = msg;
+
+			}
+			else {
+
+				int received = 0;
+				result = 0;
+				while (remaining > 0) {
+					result = recv(clientSocket, recv_buffer + received, remaining, 0);
+					if (result > 0) {
+						remaining -= result;
+						received += result;
+					}
+					else if (result == 0) {
+						printf("Remote side closed his end of the connection before all data was received\n");
+						// probably a good idea to close socket
+						break;
+					}
+					else if (result < 0) {
+						printf("ERROR!\n");
+						// probably a good idea to close socket
+						break;
+					}
+				}
+
+			}
 			//reconstructing message again
 
-			//std::stringstream messageData;
-			//std::copy(valueMData.begin(), valueMData.end(), std::ostream_iterator<int>(messageData, " "));
+			t_message messageToBuffer;
 
-			t_message messageToSend;
-
-			printf("ERROR!1\n");
-
-			messageToSend.messageData = MessageProcessors::generateMessageData(valueMData, valueMType);
-			messageToSend.messageDataLength = to_string((t_message_data_length)valueMDataLength);
-			messageToSend.messageType = valueMType;
-			//messageToSend.messageType = '\0';
-			printf("ERROR!2\n");
-
-			
+			sType = outputSignals[0]->getValueType();
 			switch (sType) {
 				case signal_value_type::t_binary:
 					outputSignals[0]->bufferPut(valueBinary);
@@ -204,8 +208,12 @@ bool IPTunnel::runBlock(void)
 					outputSignals[0]->bufferPut(valueComplexMp);
 					break;
 				case signal_value_type::t_message:
-					outputSignals[0]->bufferPut(messageToSend);
 
+					messageToBuffer.messageData = receivedString;
+					messageToBuffer.messageDataLength = to_string((t_message_data_length)valueMDataLength);
+					messageToBuffer.messageType = valueMType;
+
+					outputSignals[0]->bufferPut(messageToBuffer);
 					break;
 				default:
 					printf("Error putting signal in buffer due to signal type unknown\n");
@@ -218,9 +226,11 @@ bool IPTunnel::runBlock(void)
 	}
 	else { //client
 		ready = inputSignals[0]->ready();
+
 		int space = ipTunnelRecvInt();
 
 		process = min((long int)ready, space);
+
 		ipTunnelSendInt(process);
 
 		if (process == 0) {
@@ -275,11 +285,41 @@ bool IPTunnel::runBlock(void)
 
 				t_message_type valueMType = MessageProcessors::getMessageType(message);
 				t_message_data_length valueMDataLength = MessageProcessors::getMessageDataLength(message);
-				t_message_data valueMData = MessageProcessors::getMessageData(message, valueMDataLength);
 
 				ipTunnelPut(valueMType);
-				ipTunnelPut(valueMDataLength);
-				ipTunnelPut(valueMData);
+				ipTunnelSendInt(valueMDataLength);
+
+				string data = message.messageData;
+
+				char msg[512];
+				//acrescentar if se o size for maior que msg
+
+				if (valueMDataLength > 512)
+					printf("TAMANHO É MAIOR QUE 512");
+
+				strncpy_s(msg, data.c_str(), sizeof(msg));
+
+				//msg[sizeof(msg) - 1] = 0;
+
+				int strSz = (int)strlen(msg);
+				
+
+				char* tosend = (char*)& msg;
+				int remaining = strSz;
+				int result = 0;
+				int sent = 0;
+				while (remaining > 0) {
+					result = send(clientSocket, tosend + sent, remaining, 0);
+					if (result > 0) {
+						remaining -= result;
+						sent += remaining;
+					}
+					else if (result < 0) {
+						printf("ERROR!\n");
+						// probably a good idea to close socket
+						break;
+					}
+				}
 			}
 			break;
 		default:
@@ -311,14 +351,13 @@ int IPTunnel::ipTunnelPut(T object) {
 			sent += remaining;
 		}
 		else if (result < 0) {
-			printf("ERROR!\n");
+			printf("ERROR sending object!\n");
 			// probably a good idea to close socket
 			break;
 		}
 	}
 	return 0;
 }
-
 
 void IPTunnel::ipTunnelSendInt(int space) {
 	int data = space;
@@ -333,7 +372,7 @@ void IPTunnel::ipTunnelSendInt(int space) {
 			sent += remaining;
 		}
 		else if (result < 0) {
-			printf("ERROR!\n");
+			//printf("ERROR sending int!\n");
 			// probably a good idea to close socket
 			break;
 		}
@@ -353,12 +392,12 @@ int IPTunnel::ipTunnelRecvInt() {
 			received += result;
 		}
 		else if (result == 0) {
-			printf("Remote side closed his end of the connection before all data was received\n");
+			printf("Remote side closed his end of the connection\n");
 			// probably a good idea to close socket
 			break;
 		}
 		else if (result < 0) {
-			printf("ERROR!\n");
+			//printf("ERROR receiving int!\n");
 			// probably a good idea to close socket
 			break;
 		}

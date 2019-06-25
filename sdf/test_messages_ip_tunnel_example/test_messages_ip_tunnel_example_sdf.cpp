@@ -89,9 +89,9 @@ int main()
 	System MainSystem{
 		{
 			&BinarySource_1_,
-			&BinarySource_2_,
-			&BinarySource_3_,
-			&BinarySource_4_,
+			&Sink_2_,
+			&Sink_3_,
+			&Sink_4_,
 			&MessageProcessorReceiver_1_,
 			&BasisReconciliation_1_,
 			&MessageProcessorTransmitter_1_,
@@ -99,9 +99,10 @@ int main()
 			&BasisReconciliation_2_,
 			&MessageProcessorTransmitter_2_,
 			&Sink_1_,
-			&Sink_2_,
-			&Sink_3_,
-			&Sink_4_
+
+			&BinarySource_2_,
+			&BinarySource_3_,
+			&BinarySource_4_
 		}
 	};
 

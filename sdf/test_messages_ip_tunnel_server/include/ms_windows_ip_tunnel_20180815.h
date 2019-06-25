@@ -22,6 +22,8 @@ public:
 	template <class T>
 	int ipTunnelPut(T object);
 
+	template <class T>
+	int ipTunnelPut(T object, int objectSize);
 	// ##########################################################################
 
 	void setDisplayNumberOfSamples(bool opt) { displayNumberOfSamples = opt; };

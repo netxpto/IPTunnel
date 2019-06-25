@@ -72,13 +72,16 @@ int main()
 		{
 			&BinarySource_1_,
 			&BinarySource_2_,
-			&MessageProcessorReceiver_1_,
 			&IPTunnel_In_,
-			&IPTunnel_Out_,
+			&MessageProcessorReceiver_1_,
 			&BasisReconciliation_1_,
-			&MessageProcessorTransmitter_1_,
 			&Sink_1_,
-			&Sink_2_
+			&Sink_2_,
+			
+			&MessageProcessorTransmitter_1_,
+			&IPTunnel_Out_
+			
+			
 		}
 	};
 
