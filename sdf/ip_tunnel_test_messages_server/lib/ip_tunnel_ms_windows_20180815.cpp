@@ -135,7 +135,7 @@ bool IPTunnel::runBlock(void)
 				//////////////////////////////////////////////
 				// Point of receiving msg length
 				int lengthOfStringToReceive = ipTunnelRecvInt();
-				double numberOfMessages = ceil(lengthOfStringToReceive / 511);
+				int numberOfMessages = (int)ceil(lengthOfStringToReceive / 511.0);
 
 				string tmpMsg{ "" };
 				int msgReceived = 0;
@@ -311,10 +311,10 @@ bool IPTunnel::runBlock(void)
 			string data = message.messageData;
 
 			ipTunnelSendInt((int)data.size());
-			double numberOfMessages = ceil(data.size() / 511.0);
+			int numberOfMessages = (int)ceil(data.size() / 511.0);
 			string tmpMsg;
 			int msgSent = 0;
-			int msgToSend = min((int)data.size(), 511);
+			int msgToSend = (int)min(data.size(), 511);
 
 			for (int it = 0; it < numberOfMessages; ++it) {
 				char msg[512];
@@ -322,7 +322,7 @@ bool IPTunnel::runBlock(void)
 
 				tmpMsg.assign(data.begin() + msgSent, data.begin() + msgSent + msgToSend);
 				msgSent = msgSent + msgToSend;
-				msgToSend = min((int)data.size() - msgSent, 511);
+				msgToSend = (int)min(data.size() - msgSent, 511);
 				//acrescentar if se o size for maior que msg
 //				if (valueMDataLength > 512)
 //					printf("TAMANHO É MAIOR QUE 512");
