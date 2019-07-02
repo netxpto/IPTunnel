@@ -4,6 +4,19 @@ Tasks:
 	3) interface gráfica para o BB84
 
 
+2019-07-02
+
+	1) melhorar a eficiencia do IpTunnel
+		a) perceber melhor como funciona o socket tcp/ip
+			- os métodos
+			- documentar
+		b) documentar com mais detalhe
+
+	2) interface gráfica
+		a) documentar
+
+next meeting: 16/7, 13h30
+
 2019-06-25
 
 	1) alterar o nome de "ms_windows_ip_tunnel" para "ip_tunnel_ms_windows"
