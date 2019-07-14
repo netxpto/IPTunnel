@@ -25,14 +25,16 @@ public:
 	template <class T>
 	int ipTunnelPut(T object, int objectSize);
 
-	
+
 	template <class T, size_t N>
 	int ipTunnelPut(T(&object)[N], int elementSize, int processf);
 
-	
+
 	bool ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal_value_type stypef);
 
 	bool ipTunnelRecvMessages(vector <Signal*> outputS, int processf);
+
+	bool ipTunnelOutputData(vector <Signal*> outputS, signal_value_type sType);
 	// ##########################################################################
 
 	void setDisplayNumberOfSamples(bool opt) { displayNumberOfSamples = opt; };
@@ -55,10 +57,17 @@ public:
 
 
 	// ###########################################################################
-	
+
 private:
 
 	// # Input Parameters ########################################################
+	vector <t_binary> vBinary{};
+	vector <t_real> vReal{};
+	vector <t_complex> vComplex{};
+	vector <t_complex_xy> vComplex_xy{};
+	vector <t_photon_mp_xy> vPhoton_mp_xy{};
+	vector <t_message> vMsg{};
+
 	bool displayNumberOfSamples{ true };
 	string remoteMachineIpAddress{ "127.0.0.1" };
 	int tcpPort{ 54000 };
