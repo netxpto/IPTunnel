@@ -71,5 +71,10 @@ namespace WpfApp1
             winProtocol.Show();
             this.Hide();
         }
+
+        private void BttnStart_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
