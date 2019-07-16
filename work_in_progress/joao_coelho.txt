@@ -4,6 +4,17 @@ Tasks:
 	3) interface gráfica para o BB84
 
 
+2019-07-16
+
+	- estimar a largura de banda do IP tunnel (%), considerando a LB da interface Ethernet (concluir)
+
+	- incluir as sugestões para interface
+
+	- documentar interliagção entre redes IP diferentes
+
+next meeting: 23/7, 18h30m
+
+
 2019-07-02
 
 	1) melhorar a eficiencia do IpTunnel
