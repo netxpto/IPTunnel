@@ -1,8 +1,8 @@
-# include "../include/ip_tunnel_ms_windows_20180815.h" 
+# include "../include/ms_windows_ip_tunnel_20180815.h" 
 #include "../include/message_processor_common_20190410.h"
 
-constexpr int msgSegmentSize = 4096;
-constexpr int sizeOfValArrays = 1024;
+constexpr int msgSegmentSize = 20000;
+constexpr int sizeOfValArrays = 5000;
 
 t_binary valArrayBin[sizeOfValArrays];
 t_real valArrayReal[sizeOfValArrays];
@@ -17,14 +17,14 @@ void IPTunnel::initialize(void)
 		printf("server%d\n", n++);
 		if (!server()) {
 			printf("Error opening server\n");
-			::exit(1);
+			//			::exit(1);
 		}
 	}
 	else {
 		printf("client%d\n", n++);
 		if (!client()) {
 			printf("Error opening client\n");
-			::exit(1);
+			//			::exit(1);
 		}
 	}
 }
@@ -36,13 +36,18 @@ bool IPTunnel::runBlock(void)
 
 	if (inputSignals.empty()) { //server
 
+		signal_value_type sType = outputSignals[0]->getValueType();
+		ipTunnelOutputData(outputSignals, sType);
+
 		long space = outputSignals[0]->space();
 		for (auto k : outputSignals) {
 			long int aux = k->space();
+
+
 			space = min(space, aux);
 		}
 
-		ipTunnelSendInt(space);
+
 		//----------------------------------------RECEIVING THE SIGNAL----------------------------------------
 
 		process = ipTunnelRecvInt();
@@ -55,24 +60,30 @@ bool IPTunnel::runBlock(void)
 			return false;
 		}
 
-		signal_value_type sType = outputSignals[0]->getValueType();
+
 		if (sType == signal_value_type::t_message) {
 			ipTunnelRecvMessages(outputSignals, process);
 		}
 		else {
-			ipTunnelRecvValues( outputSignals, process, sType);
+			ipTunnelRecvValues(outputSignals, process, sType);
 		}
 
 		if (displayNumberOfSamples) {
 			cout << "Samples received through IP Tunnel: " << process << "\n";
 		}
+
+		ipTunnelOutputData(outputSignals, sType);
 	}
 	else { //client
+		signal_value_type sType = inputSignals[0]->getValueType();
+
+
+
 		ready = inputSignals[0]->ready();
 
-		int space = ipTunnelRecvInt();
 
-		process = min((long int)ready, space);
+
+		process = (long int)ready;
 
 		ipTunnelSendInt(process);
 
@@ -83,10 +94,6 @@ bool IPTunnel::runBlock(void)
 			}
 			return false;
 		}
-		signal_value_type sType = inputSignals[0]->getValueType();
-
-
-		int a, b;
 
 		switch (sType) {
 		case signal_value_type::t_binary:
@@ -145,11 +152,11 @@ bool IPTunnel::runBlock(void)
 
 				string data = message.messageData;
 
-				ipTunnelSendInt(data.size());
-				int numberOfMessages = ceil(data.size() / (double)(msgSegmentSize - 1));
+				ipTunnelSendInt((int)data.size());
+				int numberOfMessages = (int)ceil((int)data.size() / (double)(msgSegmentSize - 1));
 				string tmpMsg;
 				int msgSent = 0;
-				int msgToSend = min(data.size(), msgSegmentSize - 1);
+				int msgToSend = min((int)data.size(), msgSegmentSize - 1);
 
 				for (int it = 0; it < numberOfMessages; ++it) {
 					char msg[msgSegmentSize];
@@ -157,7 +164,7 @@ bool IPTunnel::runBlock(void)
 
 					tmpMsg.assign(data.begin() + msgSent, data.begin() + msgSent + msgToSend);
 					msgSent = msgSent + msgToSend;
-					msgToSend = min(data.size() - msgSent, 511);
+					msgToSend = min((int)data.size() - msgSent, msgSegmentSize - 1);
 					//acrescentar if se o size for maior que msg
 	//				if (valueMDataLength > 512)
 	//					printf("TAMANHO É MAIOR QUE 512");
@@ -189,7 +196,7 @@ bool IPTunnel::runBlock(void)
 			break;
 		default:
 			printf("Error sending signal due to signal type unknown\n");
-			::exit(1);
+			//::exit(1);
 		}
 		if (displayNumberOfSamples) {
 			cout << "Samples sent through IP Tunnel: " << process << "\n";
@@ -227,7 +234,7 @@ int IPTunnel::ipTunnelPut(T object) {
 template <class T, size_t N>
 int IPTunnel::ipTunnelPut(T(&object)[N], int elementSize, int processf) {
 	char* tosend = (char*)& object;
-	int remaining = elementSize*processf;
+	int remaining = elementSize * processf;
 	int result = 0;
 	int sent = 0;
 	while (remaining > 0) {
@@ -333,11 +340,7 @@ bool IPTunnel::server() {
 	int clientSize = sizeof(client);
 
 	clientSocket = accept(listening, (sockaddr*)& client, &clientSize);
-
-	setTcpNoDelay = true;
-	socketTcpNoDelayResult = setsockopt(clientSocket, IPPROTO_TCP, TCP_NODELAY, (char*)& setTcpNoDelay, sizeof(setTcpNoDelay));
-
-
+	
 	char host[NI_MAXHOST];
 	char service[NI_MAXSERV];
 
@@ -396,7 +399,7 @@ bool IPTunnel::client() {
 
 		if (--numberOfTrials == 0) {
 			cerr << "Reached maximum number of attempts." << endl;
-			::exit(1);
+			//::exit(1);
 		}
 	}
 	cout << "Connected!\n";
@@ -404,15 +407,15 @@ bool IPTunnel::client() {
 }
 
 
-bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal_value_type stypef){
+bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal_value_type stypef) {
 	int result = 0;
-	int remaining, remainingBufferType, remainingBufferDataLength;
+	int remaining;
 	char* recv_buffer = 0;
 
 	switch (stypef) {
 	case signal_value_type::t_binary:
 		recv_buffer = (char*)& valArrayBin;
-		remaining = sizeof(t_binary)*processf;
+		remaining = sizeof(t_binary) * processf;
 		break;
 	case signal_value_type::t_real:
 		recv_buffer = (char*)& valArrayReal;
@@ -432,7 +435,7 @@ bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal
 		break;
 	default:
 		printf("Error getting signal type\n");
-		::exit(1);
+		//::exit(1);
 	}
 
 	int received = 0;
@@ -457,51 +460,31 @@ bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal
 
 	switch (stypef) {
 	case signal_value_type::t_binary:
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(valArrayBin[k]);
-			}
-		}
+		vBinary.insert(vBinary.end(), valArrayBin, valArrayBin + processf);
 		break;
 	case signal_value_type::t_real:
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(valArrayReal[k]);
-			}
-		}
+		vReal.insert(vReal.end(), valArrayReal, valArrayReal + processf);
 		break;
 	case signal_value_type::t_complex:
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(valArrayComplex[k]);
-			}
-		}
+		vComplex.insert(vComplex.end(), valArrayComplex, valArrayComplex + processf);
 		break;
 	case signal_value_type::t_complex_xy:
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(valArrayComplexXY[k]);
-			}
-		}
+		vComplex_xy.insert(vComplex_xy.end(), valArrayComplexXY, valArrayComplexXY + processf);
 		break;
 	case signal_value_type::t_photon_mp_xy:
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(valArrayPhotonMPXY[k]);
-			}
-		}
+		vPhoton_mp_xy.insert(vPhoton_mp_xy.end(), valArrayPhotonMPXY, valArrayPhotonMPXY + processf);
 		break;
 	default:
 		printf("Error putting signal in buffer due to signal type unknown\n");
-		::exit(1);
+		//::exit(1);
 	}
 
-
+	return true;
 
 }
 
 bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
-	for (int k = 0; k < processf; ++k){
+	for (int k = 0; k < processf; ++k) {
 
 		t_message_type valueMType;
 		t_message_data_length valueMDataLength;
@@ -544,12 +527,18 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 		//////////////////////////////////////////////
 		// Point of receiving msg length
 		int lengthOfStringToReceive = ipTunnelRecvInt();
-		int numberOfMessages = ceil(lengthOfStringToReceive / (double)(msgSegmentSize - 1));
+		int numberOfMessages = (int)ceil(lengthOfStringToReceive / (double)(msgSegmentSize - 1));
 
 		string tmpMsgStr{ "" };
 		int msgReceived = 0;
 		int msgToReceive = min(lengthOfStringToReceive, msgSegmentSize - 1);
 
+		if (valueMType == t_message_type::ParameterEstimationSeedAndBitsMsg) {
+			cout << "RX Parameter Estimation: " << lengthOfStringToReceive << " - ";
+		}
+		else if (valueMType == t_message_type::BasisReconciliationMsg) {
+			//			cout << "RX Basis Reconciliation Message: " << lengthOfStringToReceive << " - ";
+		}
 
 		for (int it = 0; it < numberOfMessages; ++it) {
 			char msg[msgSegmentSize];
@@ -581,21 +570,101 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 			}
 
 			//msg[512 - (512 - valueMDataLength)] = 0;
-			if (result < msgSegmentSize)
-				msg[result] = 0;
-
+			if (result < msgSegmentSize) {
+				if (lengthOfStringToReceive >= msgSegmentSize) {
+					cout << "Length to receive bigger than recv buffer?";
+				}
+				else {
+					msg[lengthOfStringToReceive] = 0;
+				}
+			}
 			string tmpMsgStr{ msg };
 			receivedString = receivedString + tmpMsgStr;
 		}
-		
+
 		t_message tmpMsg;
 		tmpMsg.messageData = receivedString;
 		tmpMsg.messageDataLength = to_string((t_message_data_length)valueMDataLength);
 		tmpMsg.messageType = valueMType;
-		
-		for (unsigned int s = 0; s < outputS.size(); ++s){
-			outputS[s]->bufferPut(tmpMsg);
+
+		if (valueMDataLength != receivedString.length()) {
+			cout << "";
 		}
-		
+
+		vMsg.push_back(tmpMsg);
+
 	}
+	return true;
+}
+
+bool IPTunnel::ipTunnelOutputData(vector <Signal*> outputS, signal_value_type sType) {
+	bool alive = false;
+
+	int space = outputS[0]->getBufferLength();
+
+	for (auto k : outputS) space = (space < k->space()) ? space : k->space();
+	int processf;
+	switch (sType) {
+	case signal_value_type::t_binary:
+		processf = min(space, (int)vBinary.size());
+		for (int k = 0; k < processf; ++k) {
+			for (unsigned int s = 0; s < outputS.size(); ++s) {
+				outputS[s]->bufferPut(vBinary[k]);
+			}
+		}
+		vBinary.erase(vBinary.begin(), vBinary.begin() + processf);
+		break;
+	case signal_value_type::t_real:
+		processf = min(space, (int)vReal.size());
+		for (int k = 0; k < processf; ++k) {
+			for (unsigned int s = 0; s < outputS.size(); ++s) {
+				outputS[s]->bufferPut(vReal[k]);
+			}
+		}
+		vReal.erase(vReal.begin(), vReal.begin() + processf);
+		break;
+	case signal_value_type::t_complex:
+		processf = min(space, (int)vComplex.size());
+		for (int k = 0; k < processf; ++k) {
+			for (unsigned int s = 0; s < outputS.size(); ++s) {
+				outputS[s]->bufferPut(vComplex[k]);
+			}
+		}
+		vComplex.erase(vComplex.begin(), vComplex.begin() + processf);
+		break;
+	case signal_value_type::t_complex_xy:
+		processf = min(space, (int)vComplex_xy.size());
+		for (int k = 0; k < processf; ++k) {
+			for (unsigned int s = 0; s < outputS.size(); ++s) {
+				outputS[s]->bufferPut(vComplex_xy[k]);
+			}
+		}
+		vComplex_xy.erase(vComplex_xy.begin(), vComplex_xy.begin() + processf);
+		break;
+	case signal_value_type::t_photon_mp_xy:
+		processf = min(space, (int)vPhoton_mp_xy.size());
+		for (int k = 0; k < processf; ++k) {
+			for (unsigned int s = 0; s < outputS.size(); ++s) {
+				outputS[s]->bufferPut(vPhoton_mp_xy[k]);
+			}
+		}
+		vPhoton_mp_xy.erase(vPhoton_mp_xy.begin(), vPhoton_mp_xy.begin() + processf);
+		break;
+	case signal_value_type::t_message:
+		processf = min(space, (int)vMsg.size());
+		for (int k = 0; k < processf; ++k) {
+			for (unsigned int s = 0; s < outputS.size(); ++s) {
+				outputS[s]->bufferPut(vMsg[k]);
+			}
+		}
+		vMsg.erase(vMsg.begin(), vMsg.begin() + processf);
+		break;
+	default:
+		auto outputVec = { 0 };
+		printf("Error putting signal in buffer due to signal type unknown\n");
+		//::exit(1);
+	}
+
+	alive = true;
+	return alive;
 }
