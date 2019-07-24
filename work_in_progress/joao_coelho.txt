@@ -3,6 +3,148 @@ Tasks:
 	2) colocar o BB84 a funcionar entre duas máquinas no laboratório
 	3) interface gráfica para o BB84
 
+
+2019-07-16
+
+	- estimar a largura de banda do IP tunnel (%), considerando a LB da interface Ethernet (concluir)
+
+	- incluir as sugestões para interface
+
+	- documentar interliagção entre redes IP diferentes
+
+next meeting: 23/7, 18h30m
+
+
+2019-07-02
+
+	1) melhorar a eficiencia do IpTunnel
+		a) perceber melhor como funciona o socket tcp/ip
+			- os métodos
+			- documentar
+		b) documentar com mais detalhe
+
+	2) interface gráfica
+		a) documentar
+
+next meeting: 16/7, 13h30
+
+2019-06-25
+
+	1) alterar o nome de "ms_windows_ip_tunnel" para "ip_tunnel_ms_windows"
+	2) acabar a documentação detalhada, incluir também uma foto, incluir um fluxograma com os passos que estão a ser dados de forma optimiarmos o sistema
+	3) analisar, documentar e apresentar uma solução para a interligação com maquinas entre redes IP distintas
+		https://www.cis.upenn.edu/~bcpierce/unison/docs.html
+	4) pensar e ir escrevendo numa interface gráfica (Alice/Bob, janela com as chaves 01001..., janema com os dados do protocolo, janela com o tcp)
+
+next meeting: 2/7, 13h30m
+
+
+2019-06-18
+
+	colocar o IpTunnel a funcionar para mensagens (documentar e reportar a partir de que tamanho de mensagens deixa de funcionar)
+
+	colocar a funcionar nos PCs do laboratório com o sistema do Andoni, sem emulador de canal
+
+	analisar, documentar e apresentar uma solução para a interligação com maquinas entre redes IP distintas
+	https://www.cis.upenn.edu/~bcpierce/unison/docs.html
+
+
+next meeting: 25/6, 10h30m
+
+
+
+2019-06-07
+
+	colocar a funcionar nos PCs do laboratório com o sistema do Andoni, sem emulador de canal
+
+	analisar, documentar e apresentar uma solução para a interligação com maquinas entre redes IP distintas
+	https://www.cis.upenn.edu/~bcpierce/unison/docs.html
+
+
+next meeting: 14/6, 18h
+
+2019-06-05
+
+	- conlcuir a documentação
+		- colocar na documentação o sdk com os quais é compativel e quais os quais não é (os outros ficam indefinidos)
+	- remover o signal type do ipTunnel
+	- criar os métodos para alterar os parametros de entrada
+	- mensagem corrigir IP Tunnel
+
+
+next meeting: 7/6, 14h
+
+
+
+
+2019-05-29
+
+	concluir e melhorar a documentação
+	eliminar todos os warnings do código
+	colocar a opção displayNumberOfSamples a funcionar
+
+	testar isto na próxima reunião entre o meu PC e o teu portatil
+
+next meeting: 5/6, 14h
+
+
+2019-05-22
+
+	definir o problema
+
+	a solução será suportada por um biblioteda (temos que escolher a biblioteca)	
+	pesquisar e documentar sobre a biblioteca W2tcpip.h
+		quem desenoveu?
+		faz parte do standard?
+		é portavel?
+		é a melhor?
+
+
+	arquitetura (cliente - servidor), para estabelecer o canal TCP/IP
+	explicar que o bloco sem parametros de entrada funciona como servidor
+	parametros:
+		ipAddress (só é necessário no cliente)
+		tcpPort
+		waitTime
+
+
+	criar o cliente e o servidor deve ser na função initialize
+
+	no inicio do run deve atualizar as variavies ready e space (ipTunnelSpace())
+	process = min(ready, space)
+
+	ipTunnelPut()
+	signal_value_type sType = inputSignals[0]->getValueType();
+	switch (sType) {
+		case signal_value_type::t_binary:
+			for (int k = 0; k < process; k++) {
+				t_binary signalValue;
+				inputSignals[0]->bufferGet(&signalValue);
+				ipTunnelPut(signalValue)
+			}
+			break;
+    		case signal_value_type::t_real:
+		case signal_value_type::t_complex:
+		case signal_value_type::t_complex_xy:
+		case signal_value_type::t_photon_mp_xy:
+	}
+
+	documentar tudo bem
+
+next meeting: 29/5, 14h	
+
+
+2019-05-15
+
+	colocar a especificação do bloco no doc/lib/ip_tunnel/ip_tunnel.tex
+
+	fazer o código no sdf/ip_tunnel/lib/ip_tunnel.cpp e sdf/ip_tunnel/lib/ip_tunnel.h
+
+	testar o código sdf/ip_tunnel, correr dois programas na mesma máquina interligados por dois ip_tunnels 
+
+next meeting: 22/5 (quarta-feira), 14h
+
+
 2019-05-10
 
 	trata-se das questões administrativas com a Sandra Corujo
