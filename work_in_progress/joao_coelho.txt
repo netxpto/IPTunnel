@@ -7,10 +7,12 @@ Tasks:
 2019-07-16
 
 	- estimar a largura de banda do IP tunnel (%), considerando a LB da interface Ethernet (concluir)
-
+		Total -> 48Mbps
+		TCP   -> 35Mbps
+			 ~73%
 	- incluir as sugestões para interface
 
-	- documentar interliagção entre redes IP diferentes
+	- documentar interligação entre redes IP diferentes
 
 next meeting: 23/7, 18h30m
 

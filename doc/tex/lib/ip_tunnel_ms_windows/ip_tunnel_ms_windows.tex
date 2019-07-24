@@ -69,6 +69,33 @@ bool getDisplayNumberOfSamples();
 bool server();
 \bigbreak
 bool client();
+\bigbreak
+int ipTunnelPut(T object, int objectSize);
+\bigbreak
+int ipTunnelPut(T(\&object)[N], int elementSize, int processf);
+\bigbreak
+bool ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal\_value\_type stypef);
+\bigbreak
+bool ipTunnelRecvMessages(vector <Signal*> outputS, int processf);
+\bigbreak
+bool ipTunnelOutputData(vector <Signal*> outputS, signal\_value\_type sType);
+\bigbreak
+void setRemoteMachineIpAddress(string rMachineIpAddress;
+\bigbreak
+string getRemoteMachineIpAddress();
+\bigbreak
+void setTcpPort(int tcpP);
+\bigbreak
+int getTcpPort();
+\bigbreak
+void setNumberOfTrials(int nOfTrials);
+\bigbreak
+int getNumberOfTrials();
+\bigbreak
+void setTimeIntervalSeconds(int tIntervalSeconds);
+\bigbreak
+int getTimeIntervalSeconds();
+
 
 
 
