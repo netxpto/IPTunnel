@@ -6,6 +6,8 @@ Tasks:
 
 2019-07-24
 
+	- colocar o sdf do ip_tunnel num folder "ip_tunnel_ms_windows_rx" e  "ip_tunnel_ms_windows_tx"
+
 	- estimar a largura de banda do IP tunnel (%), considerando a LB da interface Ethernet (documentar)
 
 	- documentar interligação entre redes IP diferentes (documentar, com e sem VPN)
