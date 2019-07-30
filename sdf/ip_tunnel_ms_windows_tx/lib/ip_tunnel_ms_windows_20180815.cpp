@@ -409,7 +409,7 @@ bool IPTunnel::client() {
 
 bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal_value_type stypef) {
 	int result = 0;
-	int remaining=0;
+	int remaining = 0;
 	char* recv_buffer = 0;
 
 	switch (stypef) {
@@ -578,7 +578,7 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 					msg[lengthOfStringToReceive] = 0;
 				}
 			}
-			string tmpMsgStr{ msg };
+			//string tmpMsgStr{ };
 			receivedString = receivedString + tmpMsgStr;
 		}
 
