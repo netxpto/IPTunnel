@@ -23,11 +23,23 @@ namespace WpfApp1
     /// </summary>
     public partial class Alice : Window
     {
+
+        int refreshRate = 1000;
+        bool start = false;
+
         public Alice()
         {
+
             InitializeComponent();
 
+
+            
+
             new Thread(doSome).Start();
+
+            //
+
+            //one thread per changing value (different refresh rate)
 
             //doSome();
 
@@ -36,6 +48,8 @@ namespace WpfApp1
         
         public void doSome()
         {
+            while (!start) { }
+
             for (int i = 0; i < 1000; i++)
             {
                 textBlock.Dispatcher.BeginInvoke(new Action(() =>
@@ -44,15 +58,9 @@ namespace WpfApp1
                     
                     //((Alice)System.Windows.Application.Current.MainWindow).UpdateLayout();
                 }));
-                Thread.Sleep(500);
+                Thread.Sleep(refreshRate);
             }
-
-            Thread.Sleep(1000);
-            Thread.Sleep(1000);
-            textBlock.Dispatcher.BeginInvoke(new Action(() =>
-            {
-                textBlock.Text = "3141351435345423534534531341341412";
-            }));
+            
             
         }
 
@@ -74,7 +82,12 @@ namespace WpfApp1
 
         private void BttnStart_Click(object sender, RoutedEventArgs e)
         {
+            start = true;
+        }
 
+        private void BttnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            refreshRate = Int32.Parse(textBox.Text);
         }
     }
 }

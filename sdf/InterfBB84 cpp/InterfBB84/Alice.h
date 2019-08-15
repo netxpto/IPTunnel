@@ -1,6 +1,4 @@
 #pragma once
-#include <windows.h>
-#include<thread>
 
 
 namespace InterfBB84 {
@@ -24,7 +22,7 @@ namespace InterfBB84 {
 
 			for (size_t i = 0; i < 3; i++)
 			{
-				Sleep(1000);
+				//Sleep(1000);
 				//std::this_thread::sleep_for(1000);
 				textBox1->Text = "peido" + i;
 			}
@@ -37,7 +35,7 @@ namespace InterfBB84 {
 			//
 			//TODO: Add the constructor code here
 			//
-			std::thread thread1 = thread(doSome, 0);
+			//std::thread thread1 = thread(doSome, 0);
 			//new Thread(doSome).Start();
 			//thread1 = std::thread(doSome);
 			

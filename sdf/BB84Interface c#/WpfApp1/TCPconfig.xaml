@@ -5,14 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
-        Title="ALICE - TCP Configuration" Height="264.267" Width="381.733">
+        Title="ALICE - TCP Configuration" Height="650" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" Width="1500">
     <Grid Margin="0,0,3.2,13.4">
+        <Grid.Background>
+            <ImageBrush ImageSource="background.png"/>
+        </Grid.Background>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="1490.4"/>
             <ColumnDefinition Width="0*"/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="textBlockR" HorizontalAlignment="Left" Margin="23,118,0,0" TextWrapping="Wrap" Text="TCP Port:" VerticalAlignment="Top" Height="16" Width="52"/>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="123,84,155,113">
+        <TextBlock x:Name="textBlockR" HorizontalAlignment="Left" Margin="181,277,0,0" TextWrapping="Wrap" Text="TCP Port:" VerticalAlignment="Top" Height="16" Width="52"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="281,243,1110.4,345.6">
             <TextBlock x:Name="textBlockRemoteIpAddress" HorizontalAlignment="Left" Margin="2.2,-0.8,-0.8,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="93" RenderTransformOrigin="0.5,0.5" Text="127.0.0.1">
                 <TextBlock.RenderTransform>
                     <TransformGroup>
@@ -23,8 +26,8 @@
                     </TransformGroup>
                 </TextBlock.RenderTransform></TextBlock>
         </Border>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="76,118,251,76">
-            <TextBlock x:Name="textBlockNumReceivets1" HorizontalAlignment="Left" Margin="2.2,2.2,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="14" Width="41" RenderTransformOrigin="0.5,0.5" Text="8080">
+        <Border BorderThickness="1" BorderBrush="Black" Margin="281,277,1110.4,313.6">
+            <TextBlock x:Name="textBlockNumReceivets1" HorizontalAlignment="Left" Margin="2,-1,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="14" Width="41" RenderTransformOrigin="0.5,0.5" Text="8080">
                 <TextBlock.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -34,7 +37,7 @@
                     </TransformGroup>
                 </TextBlock.RenderTransform></TextBlock>
         </Border>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="23,84,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" Width="98"><Run Text="Remote IP Adress:"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
-        <Button x:Name="button" Content="&lt;-" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="25" Click="Button_Click" Height="20"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="181,243,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" Width="98"><Run Text="Remote IP Adress:"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
+        <Button x:Name="button" Content="&lt;-" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="31" Click="Button_Click" Height="21"/>
     </Grid>
 </Window>
