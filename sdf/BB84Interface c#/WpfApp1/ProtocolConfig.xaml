@@ -16,7 +16,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="280,244,936.8,301.6">
+        <Border BorderThickness="1" BorderBrush="Black" Margin="422,236,938.8,309.6">
             <TextBlock x:Name="textBlockRemoteIpAddress" HorizontalAlignment="Left" Margin="2.2,-0.8,-0.8,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="93" RenderTransformOrigin="0.5,0.5" Text="123456">
                 <TextBlock.RenderTransform>
                     <TransformGroup>
@@ -27,10 +27,10 @@
                     </TransformGroup>
                 </TextBlock.RenderTransform></TextBlock>
         </Border>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="170,244,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" Width="98" Text="Final key Size"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="312,236,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" Width="98" Text="Final key Size"/>
         <Button x:Name="button" Content="&lt;-" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="31" Click="Button_Click" Height="22"/>
-        <TextBlock x:Name="textBlockReceivedQubits_Copy" HorizontalAlignment="Left" Margin="169,281,0,0" TextWrapping="Wrap" Text="Cascade Block Size:" VerticalAlignment="Top" Height="18" Width="109"/>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="278,279,936.8,270.6">
+        <TextBlock x:Name="textBlockReceivedQubits_Copy" HorizontalAlignment="Left" Margin="311,273,0,0" TextWrapping="Wrap" Text="Cascade Block Size:" VerticalAlignment="Top" Height="18" Width="109"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="420,271,938.8,278.6">
             <TextBlock x:Name="textBlockNumReceivedQubits1" HorizontalAlignment="Left" Margin="2.2,-0.8,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="24" RenderTransformOrigin="0.5,0.5" Text="0">
                 <TextBlock.RenderTransform>
                     <TransformGroup>

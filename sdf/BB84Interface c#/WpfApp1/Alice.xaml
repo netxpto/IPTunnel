@@ -19,7 +19,7 @@
         <TextBlock x:Name="textBlockRefreshRate" HorizontalAlignment="Left" Margin="309,364,0,0" TextWrapping="Wrap" Text="Refresh Rate:" VerticalAlignment="Top" FontSize="14" Height="16" Width="91"/>
         <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="21" Margin="431,363,0,0" TextWrapping="Wrap" Text="1000" VerticalAlignment="Top" Width="56" BorderThickness="1"/>
         <TextBlock x:Name="textBlockRefreshRate_Copy" HorizontalAlignment="Left" Margin="489,366,0,0" TextWrapping="Wrap" Text="ms" VerticalAlignment="Top" Height="13" Width="21"/>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="561,102,388.4,483.8">
+        <Border BorderThickness="1" BorderBrush="Black" Margin="647,232,302.4,353.8">
             <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="95,3,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Width="354" RenderTransformOrigin="0.5,0.5" Text="0000 0000 0000 0000">
                 <TextBlock.RenderTransform>
 
@@ -33,8 +33,8 @@
 
                 </TextBlock.RenderTransform></TextBlock>
         </Border>
-        <Button x:Name="bttnProtocol" Content="Protocol Conf." HorizontalAlignment="Left" Margin="1018,320,0,0" VerticalAlignment="Top" Width="84" Click="BttnProtocol_Click" Height="19"/>
-        <Button x:Name="bttnTCP" Content="TCP Conf." HorizontalAlignment="Left" Margin="1018,344,0,0" VerticalAlignment="Top" Width="84" Click="BttnTCP_Click" Height="19"/>
+        <Button x:Name="bttnProtocol" Content="Protocol Conf." HorizontalAlignment="Left" Margin="1103,378,0,0" VerticalAlignment="Top" Width="84" Click="BttnProtocol_Click" Height="19"/>
+        <Button x:Name="bttnTCP" Content="TCP Conf." HorizontalAlignment="Left" Margin="1103,402,0,0" VerticalAlignment="Top" Width="84" Click="BttnTCP_Click" Height="19"/>
         <TextBlock x:Name="textBlockReceivedQubits" HorizontalAlignment="Left" Margin="309,236,0,0" TextWrapping="Wrap" Text="Sent Qubits:" VerticalAlignment="Top" FontSize="14" Height="18" Width="91"/>
         <Border BorderThickness="1" BorderBrush="Black" Margin="431,236,954.4,358.8">
             <TextBlock x:Name="textBlockNumReceivedQubits" HorizontalAlignment="Left" Margin="10,-1,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="14" Width="80" RenderTransformOrigin="0.5,0.5" Text="0">
