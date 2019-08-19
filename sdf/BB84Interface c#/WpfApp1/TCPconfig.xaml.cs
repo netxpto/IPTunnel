@@ -24,6 +24,9 @@ namespace WpfApp1
     public partial class TCPconfig : Window
     {
         private Alice alice;
+        string remoteIpAddress = "127.0.0.1";
+        int tcpPort = 8080;
+
         public TCPconfig(Alice alice)
         {
             this.alice = alice;
@@ -36,33 +39,33 @@ namespace WpfApp1
 
         }
 
+        private string getRemoteIpAddres()
+        {
+            return remoteIpAddress;
+        }
+
+        private int getTcpPort()
+        {
+            return tcpPort;
+        }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             alice.Show();
             this.Close();
         }
 
-        /* public void doSome()
-         {
-             for (int i = 0; i < 1000; i++)
-             {
-                 textBlock.Dispatcher.BeginInvoke(new Action(() =>
-                 {
-                     textBlock.Text = i.ToString();
+        private void Button1_Click(object sender, RoutedEventArgs e)
+        {
 
-                     //((Alice)System.Windows.Application.Current.MainWindow).UpdateLayout();
-                 }));
-                 Thread.Sleep(500);
-             }
+        }
 
-             Thread.Sleep(1000);
-             Thread.Sleep(1000);
-             textBlock.Dispatcher.BeginInvoke(new Action(() =>
-             {
-                 textBlock.Text = "3141351435345423534534531341341412";
-             }));
-
-         }*/
+        private void bttnSubmitTCP_Click(object sender, RoutedEventArgs e)
+        {
+            remoteIpAddress = textBoxIpAddress.Text;
+            tcpPort = Int32.Parse(textBoxTCP.Text);
+            MessageBox.Show("Configuration updated.");
+        }
+        
 
 
     }

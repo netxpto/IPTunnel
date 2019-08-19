@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="ALICE" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" Width="1300" Height="650">
-    <Grid Margin="0,0,3.2,7.4">
+    <Grid Margin="-3,0,6.6,7">
         <Grid.Background>
             <ImageBrush ImageSource="background.png"/>
         </Grid.Background>
@@ -33,8 +33,10 @@
 
                 </TextBlock.RenderTransform></TextBlock>
         </Border>
-        <Button x:Name="bttnProtocol" Content="Protocol Conf." HorizontalAlignment="Left" Margin="1103,378,0,0" VerticalAlignment="Top" Width="84" Click="BttnProtocol_Click" Height="19"/>
-        <Button x:Name="bttnTCP" Content="TCP Conf." HorizontalAlignment="Left" Margin="1103,402,0,0" VerticalAlignment="Top" Width="84" Click="BttnTCP_Click" Height="19"/>
+        <Button x:Name="bttnProtocol" Style="{StaticResource GelButton}" Content="Protocol Conf." HorizontalAlignment="Left" Margin="1103,369,0,0" VerticalAlignment="Top" Width="84" Click="BttnProtocol_Click" Height="28">
+            
+        </Button>
+        <Button x:Name="bttnTCP" Content="TCP Conf." HorizontalAlignment="Left" Margin="1103,402,0,0" VerticalAlignment="Top" Width="84" Click="BttnTCP_Click" Height="28"/>
         <TextBlock x:Name="textBlockReceivedQubits" HorizontalAlignment="Left" Margin="309,236,0,0" TextWrapping="Wrap" Text="Sent Qubits:" VerticalAlignment="Top" FontSize="14" Height="18" Width="91"/>
         <Border BorderThickness="1" BorderBrush="Black" Margin="431,236,954.4,358.8">
             <TextBlock x:Name="textBlockNumReceivedQubits" HorizontalAlignment="Left" Margin="10,-1,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="14" Width="80" RenderTransformOrigin="0.5,0.5" Text="0">
@@ -47,7 +49,7 @@
                     </TransformGroup>
                 </TextBlock.RenderTransform></TextBlock>
         </Border>
-        <Button x:Name="bttnStart" Content="Start Simulation" HorizontalAlignment="Left" Margin="444,399,0,0" VerticalAlignment="Top" Width="93" Click="BttnStart_Click" Height="26"/>
+        <Button x:Name="bttnStart" Content="Start Simulation" HorizontalAlignment="Left" Margin="444,394,0,0" VerticalAlignment="Top" Width="92" Click="BttnStart_Click" Height="36"/>
         <Border BorderThickness="1" BorderBrush="Black" Margin="431,327,953.4,261.8">
             <TextBlock x:Name="textBlockRemoteIpAddress" HorizontalAlignment="Left" Margin="2,2,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="93" RenderTransformOrigin="0.5,0.5" Text="123456">
                 <TextBlock.RenderTransform>

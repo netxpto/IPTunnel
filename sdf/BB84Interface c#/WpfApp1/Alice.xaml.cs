@@ -32,9 +32,7 @@ namespace WpfApp1
 
             InitializeComponent();
 
-
             
-
             new Thread(doSome).Start();
 
             //
@@ -82,6 +80,7 @@ namespace WpfApp1
 
         private void BttnStart_Click(object sender, RoutedEventArgs e)
         {
+            //get ip address and tcp port
             start = true;
         }
 

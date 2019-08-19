@@ -6,38 +6,30 @@
         xmlns:local="clr-namespace:WpfApp1"
         mc:Ignorable="d"
         Title="ALICE - TCP Configuration" Height="650" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight" Width="1500">
-    <Grid Margin="0,0,3.2,13.4">
+    <Grid Margin="0,0,3.6,1">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="619.2"/>
+        </Grid.RowDefinitions>
         <Grid.Background>
             <ImageBrush ImageSource="background.png"/>
         </Grid.Background>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1490.4"/>
-            <ColumnDefinition Width="0*"/>
+            <ColumnDefinition Width="1489.6"/>
         </Grid.ColumnDefinitions>
-        <TextBlock x:Name="textBlockR" HorizontalAlignment="Left" Margin="350,283,0,0" TextWrapping="Wrap" Text="TCP Port:" VerticalAlignment="Top" Height="16" Width="52"/>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="450,249,941.4,339.6">
-            <TextBlock x:Name="textBlockRemoteIpAddress" HorizontalAlignment="Left" Margin="2.2,-0.8,-0.8,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="93" RenderTransformOrigin="0.5,0.5" Text="127.0.0.1">
-                <TextBlock.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform/>
-                        <SkewTransform/>
-                        <RotateTransform Angle="0.038"/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </TextBlock.RenderTransform></TextBlock>
-        </Border>
-        <Border BorderThickness="1" BorderBrush="Black" Margin="450,283,941.4,307.6">
-            <TextBlock x:Name="textBlockNumReceivets1" HorizontalAlignment="Left" Margin="2,-1,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="14" Width="41" RenderTransformOrigin="0.5,0.5" Text="8080">
-                <TextBlock.RenderTransform>
-                    <TransformGroup>
-                        <ScaleTransform/>
-                        <SkewTransform/>
-                        <RotateTransform Angle="0.038"/>
-                        <TranslateTransform/>
-                    </TransformGroup>
-                </TextBlock.RenderTransform></TextBlock>
-        </Border>
+        <TextBlock x:Name="textBlockR" HorizontalAlignment="Left" Margin="350,287,0,0" TextWrapping="Wrap" Text="TCP Port:" VerticalAlignment="Top" Height="16" Width="52" RenderTransformOrigin="0.554,2.013"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="350,249,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="24" Width="98"><Run Text="Remote IP Adress:"/><LineBreak/><Run/><LineBreak/><Run/></TextBlock>
-        <Button x:Name="button" Content="&lt;-" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="31" Click="Button_Click" Height="21"/>
+        <Button x:Name="button" Content="Back" HorizontalAlignment="Left" Margin="350,319,0,0" VerticalAlignment="Top" Width="75" Click="Button_Click" Height="28"/>
+        <Button x:Name="bttnSubmitTCP" Content="OK" HorizontalAlignment="Left" Margin="474,319,0,0" VerticalAlignment="Top" Width="75" Click="bttnSubmitTCP_Click" RenderTransformOrigin="0.5,0.5" Height="28">
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
+        <TextBox x:Name="textBoxTCP" HorizontalAlignment="Left" Height="21" Margin="453,286,0,0" TextWrapping="Wrap" Text="8080" VerticalAlignment="Top" Width="96" BorderThickness="1"/>
+        <TextBox x:Name="textBoxIpAddress" HorizontalAlignment="Left" Height="24" Margin="453,249,0,0" TextWrapping="Wrap" Text="127.0.0.1" VerticalAlignment="Top" Width="96" BorderThickness="1"/>
     </Grid>
 </Window>
