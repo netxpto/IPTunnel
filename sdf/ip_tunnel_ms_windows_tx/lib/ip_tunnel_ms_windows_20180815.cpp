@@ -585,7 +585,7 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 		t_message tmpMsg;
 		tmpMsg.messageData = receivedString;
 		tmpMsg.messageDataLength = to_string((t_message_data_length)valueMDataLength);
-		tmpMsg.messageType = valueMType;
+		tmpMsg.messageType = to_string((t_message_type)valueMType);
 
 		if (valueMDataLength != receivedString.length()) {
 			cout << "";
