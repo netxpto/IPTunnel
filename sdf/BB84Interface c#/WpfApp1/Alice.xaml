@@ -1,0 +1,91 @@
+﻿<Window x:Class="WpfApp1.Alice"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfApp1"
+        mc:Ignorable="d"
+        Title="ALICE" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" Width="1300" Height="650">
+    <Grid Margin="-3,0,6.6,7">
+        <Grid.Background>
+            <ImageBrush ImageSource="background.png"/>
+        </Grid.Background>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1490.4"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock x:Name="textBlockRefreshRate" HorizontalAlignment="Left" Margin="309,364,0,0" TextWrapping="Wrap" Text="Refresh Rate:" VerticalAlignment="Top" FontSize="14" Height="16" Width="91"/>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="21" Margin="431,363,0,0" TextWrapping="Wrap" Text="1000" VerticalAlignment="Top" Width="56" BorderThickness="1"/>
+        <TextBlock x:Name="textBlockRefreshRate_Copy" HorizontalAlignment="Left" Margin="489,366,0,0" TextWrapping="Wrap" Text="ms" VerticalAlignment="Top" Height="13" Width="21"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="647,232,302.4,353.8">
+            <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="95,3,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="20" Width="354" RenderTransformOrigin="0.5,0.5" Text="0000 0000 0000 0000">
+                <TextBlock.RenderTransform>
+
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1.5" ScaleY="1.5" />
+                        <SkewTransform/>
+                        <RotateTransform Angle="0.038"/>
+                        <TranslateTransform/>
+
+                    </TransformGroup>
+
+                </TextBlock.RenderTransform></TextBlock>
+        </Border>
+        <Button x:Name="bttnProtocol" Style="{StaticResource GelButton}" Content="Protocol Conf." HorizontalAlignment="Left" Margin="1103,369,0,0" VerticalAlignment="Top" Width="84" Click="BttnProtocol_Click" Height="28">
+            
+        </Button>
+        <Button x:Name="bttnTCP" Content="TCP Conf." HorizontalAlignment="Left" Margin="1103,402,0,0" VerticalAlignment="Top" Width="84" Click="BttnTCP_Click" Height="28"/>
+        <TextBlock x:Name="textBlockReceivedQubits" HorizontalAlignment="Left" Margin="309,236,0,0" TextWrapping="Wrap" Text="Sent Qubits:" VerticalAlignment="Top" FontSize="14" Height="18" Width="91"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="431,236,954.4,358.8">
+            <TextBlock x:Name="textBlockNumReceivedQubits" HorizontalAlignment="Left" Margin="10,-1,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="14" Width="80" RenderTransformOrigin="0.5,0.5" Text="0">
+                <TextBlock.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform ScaleX="1.2" ScaleY="1.2" />
+                        <SkewTransform/>
+                        <RotateTransform Angle="0.038"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </TextBlock.RenderTransform></TextBlock>
+        </Border>
+        <Button x:Name="bttnStart" Content="Start Simulation" HorizontalAlignment="Left" Margin="444,394,0,0" VerticalAlignment="Top" Width="92" Click="BttnStart_Click" Height="36"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="431,327,953.4,261.8">
+            <TextBlock x:Name="textBlockRemoteIpAddress" HorizontalAlignment="Left" Margin="2,2,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="93" RenderTransformOrigin="0.5,0.5" Text="123456">
+                <TextBlock.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="0.038"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </TextBlock.RenderTransform></TextBlock>
+        </Border>
+        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="310,327,0,0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="14" Height="24" Width="107" Text="Final key Size:"/>
+        <TextBlock x:Name="textBlockR" HorizontalAlignment="Left" Margin="310,265,0,0" TextWrapping="Wrap" Text="No-Click Rate:" VerticalAlignment="Top" FontSize="14" Height="16" Width="107"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="431,267,954.4,325.8">
+            <TextBlock x:Name="textBlockNumReceivets1" HorizontalAlignment="Left" Margin="3,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="17" Width="43" RenderTransformOrigin="0.5,0.5" Text="123456">
+                <TextBlock.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="0.038"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </TextBlock.RenderTransform></TextBlock>
+        </Border>
+        <TextBlock x:Name="textBlockR_Copy" HorizontalAlignment="Left" Margin="310,297,0,0" TextWrapping="Wrap" Text="Double-Click Rate:" VerticalAlignment="Top" FontSize="14" Height="16" Width="116"/>
+        <Border BorderThickness="1" BorderBrush="Black" Margin="431,298,954.4,293.8">
+            <TextBlock x:Name="textBlockNumReceivets2" HorizontalAlignment="Left" Margin="3,0,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="16" Width="41" RenderTransformOrigin="0.5,0.5" Text="123456">
+                <TextBlock.RenderTransform>
+                    <TransformGroup>
+                        <ScaleTransform/>
+                        <SkewTransform/>
+                        <RotateTransform Angle="0.038"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </TextBlock.RenderTransform></TextBlock>
+        </Border>
+        <Button x:Name="bttnRefresh" Content="✔" HorizontalAlignment="Left" Margin="514,363,0,0" VerticalAlignment="Top" Width="23" Height="21" Click="BttnRefresh_Click" RenderTransformOrigin="0.533,-0.444"/>
+    </Grid>
+</Window>
