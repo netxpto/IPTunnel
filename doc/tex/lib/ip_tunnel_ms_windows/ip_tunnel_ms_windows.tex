@@ -121,3 +121,13 @@ The method to send the signal "t\_message" is quite different from the other sig
 	\includegraphics{./lib/ip_tunnel_ms_windows/figures/FluxogramIPTunnel.pdf}
 	\label{IP Tunnel Block}\caption{IP Tunnel MS Windows block}
 \end{figure}
+
+
+\subsection*{Bandtwith testing}
+
+This section was created to test the efficiency of the module in two environments: with Ethernet and with VPN.
+In the folder "sdf" there are two other folders with the names "ip\_tunnel\_ms\_windows\_bandwith\_tx" for the client and "ip\_tunnel\_ms\_windows\_bandwith\_rx" for the server corresponding to the simulations between the two different computers.\par
+The first experiment is between two computers in the same network with ethernet and bandwith of 100Mbps. Transmitting 8 million bits (1MB) in this setting, took about 148 seconds. 
+\par
+
+The second experiment is between two computers on different networks using VPN. The results are very similar as the module doesn't lose bandwith because of the VPN connection
