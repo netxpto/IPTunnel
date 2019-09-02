@@ -34,13 +34,13 @@ t_integer parameterEstimationNumberBitsToStart(101000);
 //bool doParameterEstimation{ false };
 t_real probabilityOfDoubleClick{ 0.1 };
 t_real probabilityOfNoClick{ 0.1 };
-//string ipTunnelIpAddress{ "127.0.0.1" };
+string ipTunnelIpAddress{ "127.0.0.1" };
 //string ipTunnelIpAddress{ "192.168.92.197" };
 //string ipTunnelIpAddress{ "192.168.81.172" };
 //string ipTunnelIpAddress{ "192.168.86.122" };
 //string ipTunnelIpAddress{ "192.168.92.131" };
 
-string ipTunnelIpAddress{ "192.168.92.131" }; // sala bolseiros
+//string ipTunnelIpAddress{ "192.168.92.131" }; // sala bolseiros
 //string ipTunnelIpAddress{ "192.168.81.172" }; // lab HP
 //string ipTunnelIpAddress{ "192.168.81.234" }; // lab Fuji
 int main()

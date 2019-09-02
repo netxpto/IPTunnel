@@ -34,12 +34,12 @@ t_integer minimumSyndromeSize{ 100000 };
 t_integer parameterEstimationNumberBits(1000);
 t_integer parameterEstimationNumberBitsToStart(101000);
 //bool doParameterEstimation{ false };
-//string ipTunnelIpAddress{ "127.0.0.1" };
+string ipTunnelIpAddress{ "127.0.0.1" };
 //string ipTunnelIpAddress{ "192.168.81.234" };
 //
 //string ipTunnelIpAddress{ "192.168.92.197" };
 
-string ipTunnelIpAddress{ "192.168.1.7" }; // sala bolseiros
+//string ipTunnelIpAddress{ "192.168.1.7" }; // sala bolseiros
 //string ipTunnelIpAddress{ "192.168.81.172" }; // lab HP
 //string ipTunnelIpAddress{ "192.168.81.234" }; // lab Fuji
 

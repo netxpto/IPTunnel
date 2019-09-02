@@ -60,13 +60,19 @@ bool IPTunnel::runBlock(void)
 			return false;
 		}
 
+		std::clock_t start;
+		double duration;
 
-		if (sType == signal_value_type::t_message) {
-			ipTunnelRecvMessages(outputSignals, process);
-		}
-		else {
-			ipTunnelRecvValues(outputSignals, process, sType);
-		}
+		start = std::clock();
+
+
+		ipTunnelRecvValues(outputSignals, process, sType);
+		
+		duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+
+		std::cout << "printf: " << duration << '\n';
+
+
 
 		if (displayNumberOfSamples) {
 			cout << "Samples received through IP Tunnel: " << process << "\n";
@@ -96,104 +102,25 @@ bool IPTunnel::runBlock(void)
 		}
 
 		switch (sType) {
-		case signal_value_type::t_binary:
+		case signal_value_type::t_binary: //SEND FILE
+			std::clock_t start;
+			double duration;
+
+			start = std::clock();
+
 			for (int k = 0; k < process; k++) {
 				t_binary signalValue;
 				inputSignals[0]->bufferGet(&signalValue);
 				valArrayBin[k] = signalValue;
 			}
 			ipTunnelPut(valArrayBin, sizeof(t_binary), process);
+
+			duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
+
+			std::cout << "printf: " << duration << '\n';
+
 			break;
-		case signal_value_type::t_real:
-			for (int k = 0; k < process; k++) {
-				t_real signalValue;
-				inputSignals[0]->bufferGet(&signalValue);
-				valArrayReal[k] = signalValue;
-			}
-			ipTunnelPut(valArrayReal, sizeof(t_real), process);
-			break;
-		case signal_value_type::t_complex:
-			for (int k = 0; k < process; k++) {
-				t_complex signalValue;
-				inputSignals[0]->bufferGet(&signalValue);
-				valArrayComplex[k] = signalValue;
-			}
-			ipTunnelPut(valArrayComplex, sizeof(t_complex), process);
-			break;
-		case signal_value_type::t_complex_xy:
-			for (int k = 0; k < process; k++) {
-				t_complex_xy signalValue;
-				inputSignals[0]->bufferGet(&signalValue);
-				valArrayComplexXY[k] = signalValue;
-			}
-			ipTunnelPut(valArrayComplexXY, sizeof(t_complex_xy), process);
-			break;
-
-		case signal_value_type::t_photon_mp_xy:
-			for (int k = 0; k < process; k++) {
-				t_photon_mp_xy signalValue;
-				inputSignals[0]->bufferGet(&signalValue);
-				valArrayPhotonMPXY[k] = signalValue;
-			}
-			ipTunnelPut(valArrayPhotonMPXY, sizeof(t_photon_mp_xy), process);
-			break;
-		case signal_value_type::t_message:
-			for (int k = 0; k < process; k++) {
-				t_message message;
-				inputSignals[0]->bufferGet(&message);
-
-				t_message_type valueMType = MessageProcessors::getMessageType(message);
-				t_message_data_length valueMDataLength = MessageProcessors::getMessageDataLength(message);
-
-				ipTunnelPut(valueMType);
-				ipTunnelSendInt(valueMDataLength);
-				//////////////////////////////////////////////
-				// Point of sending msg length
-
-				string data = message.messageData;
-
-				ipTunnelSendInt((int)data.size());
-				int numberOfMessages = (int)ceil((int)data.size() / (double)(msgSegmentSize - 1));
-				string tmpMsg;
-				int msgSent = 0;
-				int msgToSend = min((int)data.size(), msgSegmentSize - 1);
-
-				for (int it = 0; it < numberOfMessages; ++it) {
-					char msg[msgSegmentSize];
-
-
-					tmpMsg.assign(data.begin() + msgSent, data.begin() + msgSent + msgToSend);
-					msgSent = msgSent + msgToSend;
-					msgToSend = min((int)data.size() - msgSent, msgSegmentSize - 1);
-					//acrescentar if se o size for maior que msg
-	//				if (valueMDataLength > 512)
-	//					printf("TAMANHO É MAIOR QUE 512");
-					strncpy_s(msg, tmpMsg.c_str(), sizeof(msg));
-
-					//					msg[sizeof(msg) - 1] = 0;
-
-					int strSz = (int)strlen(msg);
-
-
-					char* tosend = (char*)& msg;
-					int remaining = strSz;
-					int result = 0;
-					int sent = 0;
-					while (remaining > 0) {
-						result = send(clientSocket, tosend + sent, remaining, 0);
-						if (result > 0) {
-							remaining -= result;
-							sent += remaining;
-						}
-						else if (result < 0) {
-							printf("ERROR!\n");
-							// probably a good idea to close socket
-							break;
-						}
-					}
-				}
-			}
-			break;
+		
 		default:
 			printf("Error sending signal due to signal type unknown\n");
 			//::exit(1);
@@ -413,26 +340,13 @@ bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal
 	char* recv_buffer = 0;
 
 	switch (stypef) {
-	case signal_value_type::t_binary:
+	case signal_value_type::t_binary: //RECEIVE FILE
+
+		
 		recv_buffer = (char*)& valArrayBin;
 		remaining = sizeof(t_binary) * processf;
 		break;
-	case signal_value_type::t_real:
-		recv_buffer = (char*)& valArrayReal;
-		remaining = sizeof(t_real) * processf;
-		break;
-	case signal_value_type::t_complex:
-		recv_buffer = (char*)& valArrayComplex;
-		remaining = sizeof(t_complex) * processf;
-		break;
-	case signal_value_type::t_complex_xy:
-		recv_buffer = (char*)& valArrayComplexXY;
-		remaining = sizeof(t_complex_xy) * processf;
-		break;
-	case signal_value_type::t_photon_mp_xy:
-		recv_buffer = (char*)& valArrayPhotonMPXY;
-		remaining = sizeof(t_photon_mp_xy) * processf;
-		break;
+	
 	default:
 		printf("Error getting signal type\n");
 		//::exit(1);
@@ -462,18 +376,6 @@ bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal
 	case signal_value_type::t_binary:
 		vBinary.insert(vBinary.end(), valArrayBin, valArrayBin + processf);
 		break;
-	case signal_value_type::t_real:
-		vReal.insert(vReal.end(), valArrayReal, valArrayReal + processf);
-		break;
-	case signal_value_type::t_complex:
-		vComplex.insert(vComplex.end(), valArrayComplex, valArrayComplex + processf);
-		break;
-	case signal_value_type::t_complex_xy:
-		vComplex_xy.insert(vComplex_xy.end(), valArrayComplexXY, valArrayComplexXY + processf);
-		break;
-	case signal_value_type::t_photon_mp_xy:
-		vPhoton_mp_xy.insert(vPhoton_mp_xy.end(), valArrayPhotonMPXY, valArrayPhotonMPXY + processf);
-		break;
 	default:
 		printf("Error putting signal in buffer due to signal type unknown\n");
 		//::exit(1);
@@ -481,118 +383,6 @@ bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal
 
 	return true;
 
-}
-
-bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
-	for (int k = 0; k < processf; ++k) {
-
-		t_message_type valueMType;
-		t_message_data_length valueMDataLength;
-		t_message_data valueMData;
-
-		int result = 0;
-		int remaining, remainingBufferType, remainingBufferDataLength;
-		char* recv_buffer = 0;
-		char* recv_bufferType = (char*)& valueMType;
-
-		remainingBufferType = sizeof(t_message_type);
-		remainingBufferDataLength = sizeof(t_message_data_length);
-
-		string receivedString;
-
-		int received = 0;//receiving message type
-		result = 0;
-		while (remainingBufferType > 0) {
-			result = recv(clientSocket, recv_bufferType + received, remainingBufferType, 0);
-			if (result > 0) {
-				remainingBufferType -= result;
-				received += result;
-			}
-			else if (result == 0) {
-				printf("Remote side closed his end of the connection before all data was received\n");
-				// probably a good idea to close socket
-				break;
-			}
-			else if (result < 0) {
-				printf("ERROR!\n");
-				// probably a good idea to close socket
-				break;
-			}
-		}
-
-		// Probably receive the number N of strings first, and iterate to receive N strings
-		valueMDataLength = ipTunnelRecvInt();
-
-		//////////////////////////////////////////////
-		// Point of receiving msg length
-		int lengthOfStringToReceive = ipTunnelRecvInt();
-		int numberOfMessages = (int)ceil(lengthOfStringToReceive / (double)(msgSegmentSize - 1));
-
-		int msgReceived = 0;
-		int msgToReceive = min(lengthOfStringToReceive, msgSegmentSize - 1);
-
-		if (valueMType == t_message_type::ParameterEstimationSeedAndBitsMsg) {
-			cout << "RX Parameter Estimation: " << lengthOfStringToReceive << " - ";
-		}
-		else if (valueMType == t_message_type::BasisReconciliationMsg) {
-			//			cout << "RX Basis Reconciliation Message: " << lengthOfStringToReceive << " - ";
-		}
-
-		for (int it = 0; it < numberOfMessages; ++it) {
-			char msg[msgSegmentSize];
-
-			remaining = msgToReceive;//sizeof(msg);
-			msgReceived = msgToReceive;
-			msgToReceive = min(lengthOfStringToReceive - msgReceived, msgSegmentSize - 1);
-
-			recv_buffer = (char*)& msg;
-
-			received = 0;//receiving message data
-			result = 0;
-			while (remaining > 0) {
-				result = recv(clientSocket, recv_buffer + received, remaining, 0);
-				if (result > 0) {
-					remaining -= result;
-					received += result;
-				}
-				else if (result == 0) {
-					printf("Remote side closed his end of the connection before all data was received\n");
-					// probably a good idea to close socket
-					break;
-				}
-				else if (result < 0) {
-					printf("ERROR!\n");
-					// probably a good idea to close socket
-					break;
-				}
-			}
-
-			//msg[512 - (512 - valueMDataLength)] = 0;
-			if (result < msgSegmentSize) {
-				if (lengthOfStringToReceive >= msgSegmentSize) {
-					cout << "Length to receive bigger than recv buffer?";
-				}
-				else {
-					msg[lengthOfStringToReceive] = 0;
-				}
-			}
-			string tmpMsgStr{ msg };
-			receivedString = receivedString + tmpMsgStr;
-		}
-
-		t_message tmpMsg;
-		tmpMsg.messageData = receivedString;
-		tmpMsg.messageDataLength = to_string((t_message_data_length)valueMDataLength);
-		tmpMsg.messageType = to_string((t_message_type)valueMType);
-
-		if (valueMDataLength != receivedString.length()) {
-			cout << "";
-		}
-
-		vMsg.push_back(tmpMsg);
-
-	}
-	return true;
 }
 
 bool IPTunnel::ipTunnelOutputData(vector <Signal*> outputS, signal_value_type sType) {
@@ -611,51 +401,6 @@ bool IPTunnel::ipTunnelOutputData(vector <Signal*> outputS, signal_value_type sT
 			}
 		}
 		vBinary.erase(vBinary.begin(), vBinary.begin() + processf);
-		break;
-	case signal_value_type::t_real:
-		processf = min(space, (int)vReal.size());
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(vReal[k]);
-			}
-		}
-		vReal.erase(vReal.begin(), vReal.begin() + processf);
-		break;
-	case signal_value_type::t_complex:
-		processf = min(space, (int)vComplex.size());
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(vComplex[k]);
-			}
-		}
-		vComplex.erase(vComplex.begin(), vComplex.begin() + processf);
-		break;
-	case signal_value_type::t_complex_xy:
-		processf = min(space, (int)vComplex_xy.size());
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(vComplex_xy[k]);
-			}
-		}
-		vComplex_xy.erase(vComplex_xy.begin(), vComplex_xy.begin() + processf);
-		break;
-	case signal_value_type::t_photon_mp_xy:
-		processf = min(space, (int)vPhoton_mp_xy.size());
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(vPhoton_mp_xy[k]);
-			}
-		}
-		vPhoton_mp_xy.erase(vPhoton_mp_xy.begin(), vPhoton_mp_xy.begin() + processf);
-		break;
-	case signal_value_type::t_message:
-		processf = min(space, (int)vMsg.size());
-		for (int k = 0; k < processf; ++k) {
-			for (unsigned int s = 0; s < outputS.size(); ++s) {
-				outputS[s]->bufferPut(vMsg[k]);
-			}
-		}
-		vMsg.erase(vMsg.begin(), vMsg.begin() + processf);
 		break;
 	default:
 		auto outputVec = { 0 };
