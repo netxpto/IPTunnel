@@ -318,7 +318,7 @@ bool IPTunnel::server() {
 
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
-	hint.sin_port = ntohs(tcpPort);
+	hint.sin_port = ntohs((u_short)tcpPort);
 	//inet_pton(AF_INET, (PCSTR)remoteMachineIpAddress.c_str(), &hint.sin_addr.s_addr); // hint.sin_addr.S_un.S_addr = inet_addr(ipAddressServer.c_str());
 	hint.sin_addr.S_un.S_addr = INADDR_ANY;
 
@@ -334,7 +334,7 @@ bool IPTunnel::server() {
 	}
 
 	bool setTcpNoDelay = true;
-	int socketTcpNoDelayResult = setsockopt(listening, IPPROTO_TCP, TCP_NODELAY, (char*)& setTcpNoDelay, sizeof(setTcpNoDelay));
+	setsockopt(listening, IPPROTO_TCP, TCP_NODELAY, (char*)& setTcpNoDelay, sizeof(setTcpNoDelay));
 
 	sockaddr_in client;
 	int clientSize = sizeof(client);
@@ -381,11 +381,11 @@ bool IPTunnel::client() {
 
 	sockaddr_in hint;
 	hint.sin_family = AF_INET;
-	hint.sin_port = htons(tcpPort);
+	hint.sin_port = htons((u_short)tcpPort);
 	inet_pton(AF_INET, remoteMachineIpAddress.c_str(), &hint.sin_addr);
 
 	bool setTcpNoDelay = true;
-	int socketTcpNoDelayResult = setsockopt(clientSocket, IPPROTO_TCP, TCP_NODELAY, (char*)& setTcpNoDelay, sizeof(setTcpNoDelay));
+	setsockopt(clientSocket, IPPROTO_TCP, TCP_NODELAY, (char*)& setTcpNoDelay, sizeof(setTcpNoDelay));
 
 	int connResult = -2;
 	while (connResult != 0 || numberOfTrials == 0) {
@@ -409,7 +409,7 @@ bool IPTunnel::client() {
 
 bool IPTunnel::ipTunnelRecvValues(vector <Signal*> outputS, int processf, signal_value_type stypef) {
 	int result = 0;
-	int remaining;
+	int remaining = 0;
 	char* recv_buffer = 0;
 
 	switch (stypef) {
@@ -493,7 +493,6 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 		int result = 0;
 		int remaining, remainingBufferType, remainingBufferDataLength;
 		char* recv_buffer = 0;
-		char* recv_bufferDataLength = 0;
 		char* recv_bufferType = (char*)& valueMType;
 
 		remainingBufferType = sizeof(t_message_type);
@@ -529,7 +528,6 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 		int lengthOfStringToReceive = ipTunnelRecvInt();
 		int numberOfMessages = (int)ceil(lengthOfStringToReceive / (double)(msgSegmentSize - 1));
 
-		string tmpMsgStr{ "" };
 		int msgReceived = 0;
 		int msgToReceive = min(lengthOfStringToReceive, msgSegmentSize - 1);
 
@@ -585,7 +583,7 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 		t_message tmpMsg;
 		tmpMsg.messageData = receivedString;
 		tmpMsg.messageDataLength = to_string((t_message_data_length)valueMDataLength);
-		tmpMsg.messageType = valueMType;
+		tmpMsg.messageType = to_string((t_message_type)valueMType);
 
 		if (valueMDataLength != receivedString.length()) {
 			cout << "";

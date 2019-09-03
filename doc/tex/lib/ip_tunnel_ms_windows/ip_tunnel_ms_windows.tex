@@ -1,5 +1,6 @@
 \clearpage
 
+
 \section{IP Tunnel MS Windows}
 
 \begin{tcolorbox}	
@@ -106,18 +107,29 @@ int getTimeIntervalSeconds();
 
 \subsection*{Functional Description}
 
+\begin{figure}[hbt!]
+	\centering
+	\includegraphics[width=1.0\textwidth]{./lib/ip_tunnel_ms_windows/figures/StructureTCPIP4.pdf}
+	\label{IP Tunnel Block}\caption{IP Tunnel MS Windows structure}
+\end{figure}
+
 The IP Tunnel block transfers signals from one machine to another so it continues the simulation in two different computers. This block is duplicated onto two machines, one with only input (client) and other with only output signals (server). After being executed, the input signal's buffer (1) will be empty and this block will transmit this signal to the other block. The second block will output this signal to the output buffer (4). An architecture "Server - Client" is used to establish a TCP/IP channel between the two blocks (2 and 3). The block without input signal is the server (receiver) and the block with input signal is the client (transmitter). After the connection is established, server sends the "space" of its buffer (maximum signal size that can be received) and client responds with the "process" (signal size that is going to be transmitted) and with an integer representing the type of signal. Subsequently, the transmission of the signal starts and the simulation continues normally on both machines.
 
 The method to send the signal "t\_message" is quite different from the other signals: client first deconstructs the object "t\_message" into its 3 parameters (message type, message data length and message data). Then, after converting the message data to a char array, the size of the array and each message parameter is sent to the server. On the server side, the message is constructed with its parameters so it can be sent to the output buffer.
 
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=1.0\textwidth]{./lib/ip_tunnel_ms_windows/figures/StructureTCPIP4.pdf}
-	\label{IP Tunnel Block}\caption{IP Tunnel MS Windows block}
-\end{figure}
 
-\begin{figure}[h]
+\subsection*{Bandtwith testing}
+\par
+This section was created to test the efficiency of the module in two environments: with Ethernet and with VPN.
+In the folder "sdf" there are two other folders with the names "ip\_tunnel\_ms\_windows\_bandwith\_test\_tx" for the client and "ip\_tunnel\_ms\_windows\_bandwith\_test\_rx" for the server corresponding to  simulations between the two different computers.
+\par
+The first experiment is between two computers in the same network with ethernet and bandwith of 100Mbps. The test occurs running the two simulations at the same time, being necessary to configure the number of bits to be sent. The default is 8 million bits. Transmitting this size of bits (1MB) in this setting, took about 148 seconds. 
+\par
+The second experiment is between two computers on different networks using VPN. This experiment was conducted in two machines running windows 10 using the windows VPN configuration. On one machine, it was initiated the outgoing VPN connection and on the second machine, the incoming VPN connection was established. After this, the simulations are done the same way of the first experiment.
+The results are very similar with the first experiment, as the module doesn't lose bandwith taking about 153 seconds to transfer 1MB.
+
+\begin{figure}[hbt!]
 	\centering
 	\includegraphics{./lib/ip_tunnel_ms_windows/figures/FluxogramIPTunnel.pdf}
-	\label{IP Tunnel Block}\caption{IP Tunnel MS Windows block}
+	\label{IP Tunnel Block}\caption{IP Tunnel MS Windows fluxogram}
 \end{figure}

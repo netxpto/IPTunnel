@@ -493,7 +493,6 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 		int result = 0;
 		int remaining, remainingBufferType, remainingBufferDataLength;
 		char* recv_buffer = 0;
-		//char* recv_bufferDataLength = 0;
 		char* recv_bufferType = (char*)& valueMType;
 
 		remainingBufferType = sizeof(t_message_type);
@@ -529,7 +528,6 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 		int lengthOfStringToReceive = ipTunnelRecvInt();
 		int numberOfMessages = (int)ceil(lengthOfStringToReceive / (double)(msgSegmentSize - 1));
 
-		string tmpMsgStr{ };
 		int msgReceived = 0;
 		int msgToReceive = min(lengthOfStringToReceive, msgSegmentSize - 1);
 
@@ -578,14 +576,14 @@ bool IPTunnel::ipTunnelRecvMessages(vector <Signal*> outputS, int processf) {
 					msg[lengthOfStringToReceive] = 0;
 				}
 			}
-			//string tmpMsgStr{ };
+			string tmpMsgStr{ msg };
 			receivedString = receivedString + tmpMsgStr;
 		}
 
 		t_message tmpMsg;
 		tmpMsg.messageData = receivedString;
 		tmpMsg.messageDataLength = to_string((t_message_data_length)valueMDataLength);
-		tmpMsg.messageType = valueMType;
+		tmpMsg.messageType = to_string((t_message_type)valueMType);
 
 		if (valueMDataLength != receivedString.length()) {
 			cout << "";
